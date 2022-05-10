@@ -29,11 +29,6 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 
 // additional init stuff should go before hitting the routing
 
-// default index route
-app.get('/', (req, res) => {
-  res.send('welcome to my platform API :)');
-});
-
 app.use('/api', apiRoutes);
 
 // START THE SERVER

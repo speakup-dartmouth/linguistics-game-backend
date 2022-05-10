@@ -29,7 +29,6 @@ router.route('/posts')
 
 router.route('/posts/:postID')
   .get(async (req, res) => {
-    res.json({ hi: `gettt ${req.params.postID}` });
     try {
       const result = await Posts.getPost(req.params.postID);
       res.json(result);
@@ -38,7 +37,6 @@ router.route('/posts/:postID')
     }
   })
   .put(async (req, res) => {
-    res.json({ hi: `puttt ${req.params.postID}` });
     try {
       const result = await Posts.updatePost(req.params.postID, req.body);
       res.json(result);
@@ -47,7 +45,6 @@ router.route('/posts/:postID')
     }
   })
   .delete(async (req, res) => {
-    res.json({ hi: `delete ${req.params.postID}` });
     try {
       const result = await Posts.deletePost(req.params.postID);
       res.json(result);
