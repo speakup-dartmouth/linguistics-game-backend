@@ -23,7 +23,7 @@ router.route('/posts')
       const result = await Posts.getPosts();
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(404).json({ error });
     }
   });
 
@@ -33,7 +33,7 @@ router.route('/posts/:postID')
       const result = await Posts.getPost(req.params.postID);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(404).json({ error });
     }
   })
   .put(async (req, res) => {
@@ -49,7 +49,7 @@ router.route('/posts/:postID')
       const result = await Posts.deletePost(req.params.postID);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(401).json({ error });
     }
   });
 

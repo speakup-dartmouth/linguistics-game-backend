@@ -25,6 +25,10 @@ export async function getPost(id) {
   // await finding one post
   const post = await Post.findById(id);
   // return post
+  console.log(post);
+  if (!post) {
+    throw new Error('post not found');
+  }
   return post;
 }
 export async function deletePost(id) {
@@ -36,7 +40,7 @@ export async function deletePost(id) {
 export async function updatePost(id, postFields) {
   try {
     // await updating a post by id
-    const post = await Post.findByIdAndUpdate(id, postFields);
+    const post = await Post.findByIdAndUpdate(id, postFields, { returnDocument: 'after' });
     // return *updated* post
     return post;
   } catch (error) {
