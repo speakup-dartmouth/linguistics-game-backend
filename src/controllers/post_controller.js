@@ -47,3 +47,12 @@ export async function updatePost(id, postFields) {
     throw new Error(`update post error: ${error}`);
   }
 }
+
+export async function findPosts(query) {
+  try {
+    const posts = await Post.find({ title: new RegExp(query) });
+    return posts;
+  } catch (error) {
+    throw new Error(`failed to fetch posts, error: ${error}`);
+  }
+}

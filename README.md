@@ -15,4 +15,4 @@ implementing basic functionality was fairly intuitive, easy to set up get, post,
 had to refactor Lab 4 slightly to account for changes
 
 ## Extra Credit
-TBD!!
+Added findPosts() method; can append an optional query to /posts GET request (e.g. /posts?q=test) in order to search

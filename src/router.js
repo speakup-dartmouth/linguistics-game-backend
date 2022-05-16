@@ -20,8 +20,14 @@ router.route('/posts')
   })
   .get(async (req, res) => {
     try {
-      const result = await Posts.getPosts();
-      res.json(result);
+      const query = req.query.q;
+      if (query) {
+        const result = await Posts.findPosts(query);
+        res.json(result);
+      } else {
+        const result = await Posts.getPosts();
+        res.json(result);
+      }
     } catch (error) {
       res.status(404).json({ error });
     }
