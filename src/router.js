@@ -1,5 +1,12 @@
 import { Router } from 'express';
+import dotenv from 'dotenv';
 import * as Posts from './controllers/post_controller';
+import * as UserController from './controllers/user_controller';
+import { requireAuth, requireSignin } from './services/passport';
+
+dotenv.config({ silent: true });
+
+// const { AUTH_SECRET } = process.env;
 
 const router = Router();
 
@@ -7,10 +14,12 @@ router.get('/', (req, res) => {
   res.json({ message: 'welcome to the munch api!' });
 });
 
+/// your routes will go here
+
 router.route('/posts')
-  .post(async (req, res) => {
+  .post(requireAuth, async (req, res) => {
     try {
-      const result = await Posts.createPost(req.body);
+      const result = await Posts.createPost(req.body, req.user);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error });
@@ -58,3 +67,21 @@ router.route('/posts/:postID')
   });
 
 export default router;
+
+router.post('/signin', requireSignin, async (req, res) => {
+  try {
+    const token = UserController.signin(req.user);
+    res.json({ token, email: req.user.email });
+  } catch (error) {
+    res.status(422).send({ error: error.toString() });
+  }
+});
+
+router.post('/signup', async (req, res) => {
+  try {
+    const token = await UserController.signup(req.body);
+    res.json({ token, email: req.body.email });
+  } catch (error) {
+    res.status(422).send({ error: error.toString() });
+  }
+});
