@@ -22,5 +22,6 @@ TODO: how to deploy the project
 ## Authors
 
 - Isabella Hochschild '25
+- Gregory Macharia '22
 
 ## Acknowledgments
