@@ -21,6 +21,6 @@ TODO: how to deploy the project
 
 ## Authors
 
-TODO: list of authors
+- Isabella Hochschild '25
 
 ## Acknowledgments
