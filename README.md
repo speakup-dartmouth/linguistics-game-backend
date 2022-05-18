@@ -22,6 +22,7 @@ TODO: how to deploy the project
 ## Authors
 
 - Isabella Hochschild '25
+- Gregory Macharia '22
 - Henry Kim '23
 - Samuel Wang '23
 - Rehoboth Okorie '23
