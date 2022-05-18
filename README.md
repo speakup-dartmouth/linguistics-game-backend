@@ -23,6 +23,7 @@ TODO: how to deploy the project
 
 - Isabella Hochschild '25
 - Henry Kim '23
+- Samuel Wang '23
 - Rehoboth Okorie '23
 - Jordan Jones '24
 
