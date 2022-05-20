@@ -24,6 +24,7 @@
     "@babel/core": "^7.17.10",
     "@babel/node": "^7.17.10",
     "@babel/preset-env": "^7.17.10",
+    "aws-sdk": "^2.1139.0",
     "babel-node": "^0.0.1-security",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
