@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import * as Posts from './controllers/post_controller';
 import * as UserController from './controllers/user_controller';
 import { requireAuth, requireSignin } from './services/passport';
+import signS3 from './services/s3';
 
 dotenv.config({ silent: true });
 
@@ -85,3 +86,5 @@ router.post('/signup', async (req, res) => {
     res.status(422).send({ error: error.toString() });
   }
 });
+
+router.get('/sign-s3', signS3);
