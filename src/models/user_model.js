@@ -17,6 +17,7 @@ const UserSchema = new Schema({
   username: { type: String, unique: true, lowercase: true },
   bio: { type: String },
   password: { type: String },
+  profilePicture: String,
   following: { type: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}] },
   followers: { type: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}] },
   collections: [CollectionSchema],

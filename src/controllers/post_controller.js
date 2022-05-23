@@ -27,13 +27,13 @@ export async function createPost(postFields) {
 }
 export async function getPosts() {
   // await finding posts
-  const posts = await Post.find();
+  const posts = await Post.find().populate('author', 'username profilePicture');
   // return posts
   return posts;
 }
 export async function getPost(id) {
   // await finding one post
-  const post = await Post.findById(id);
+  const post = await Post.findById(id).populate('author', 'username profilePicture');
   // return post
   if (!post) {
     throw new Error('post not found');
