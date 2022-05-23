@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
 import * as Posts from './controllers/post_controller';
-import * as UserController from './controllers/user_controller';
+import * as Users from './controllers/user_controller';
 import { requireAuth, requireSignin } from './services/passport';
 import signS3 from './services/s3';
 
@@ -67,7 +67,34 @@ router.route('/posts/:postID')
     }
   });
 
-export default router;
+router.route('/users')
+  .get(async (req, res) => {
+    try {
+      const result = await Users.getUsers();
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error });
+    }
+  });
+
+router.route('/users/:id')
+  .get(async (req, res) => {
+    try {
+      const id = req.params.id;
+      const result = await Users.getUser(id);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error });
+    }
+  })
+  .put(async (req, res) => {
+      try {
+        const result = await Users.updateUser(req.params.id, req.body);
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error });
+      }
+  });
 
 router.post('/signin', requireSignin, async (req, res) => {
   try {
@@ -86,5 +113,8 @@ router.post('/signup', async (req, res) => {
     res.status(422).send({ error: error.toString() });
   }
 });
+  
 
 router.get('/sign-s3', signS3);
+
+export default router;

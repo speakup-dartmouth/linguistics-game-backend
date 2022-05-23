@@ -4,6 +4,35 @@ import User from '../models/user_model';
 
 dotenv.config({ silent: true });
 
+export async function getUser(id) {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new Error('user not found');
+  }
+  return user;
+}
+
+export async function getUsers() {
+  const users = await User.find();
+  return users;
+}
+
+export async function updateUser(id, userFields) {
+  try {
+    console.log(userFields.collections);
+    const user = await User.findByIdAndUpdate(id, userFields, { returnDocument: 'after' });
+    return user;
+  } catch (error) {
+    console.log(error);
+    throw new Error(`update user error: ${error}`);
+  }
+}
+
+export async function deletePost(id) {
+  await User.findByIdAndDelete(id);
+  return { msg: `user ${id} deleted successfully.` };
+}
+
 export const signin = (user) => {
   return tokenForUser(user);
 };

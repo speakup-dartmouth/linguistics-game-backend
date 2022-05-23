@@ -25,7 +25,6 @@ export async function getPost(id) {
   // await finding one post
   const post = await Post.findById(id);
   // return post
-  console.log(post);
   if (!post) {
     throw new Error('post not found');
   }
