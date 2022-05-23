@@ -17,7 +17,7 @@ export async function createPost(postFields) {
 }
 export async function getPosts() {
   // await finding posts
-  const posts = await Post.find();
+  const posts = await Post.find().populate('author');
   // return posts
   return posts;
 }
