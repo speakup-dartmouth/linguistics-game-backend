@@ -94,11 +94,41 @@ router.route('/users/:id')
       } catch (error) {
         res.status(500).json({ error });
       }
+  })
+  .delete(async (req, res) => {
+    try {
+      const result = await Users.deleteUser(req.params.id);
+      res.json(result);
+    } catch (error) {
+      res.status(401).json({ error });
+    }
+  });
+
+  router.route('/users/:id/home-posts')
+    .get(async (req, res) => {
+      try {
+        const id = req.params.id;
+        const result = await Users.getHomePosts(id);
+        res.json(result);
+      } catch (error) {
+        res.status(404).json({ error });
+      }
+  });
+
+  router.route('/users/:id/own-posts')
+    .get(async (req, res) => {
+      try {
+        const id = req.params.id;
+        const result = await Users.getOwnPosts(id);
+        res.json(result);
+      } catch (error) {
+        res.status(404).json({ error });
+      }
   });
 
 router.post('/signin', requireSignin, async (req, res) => {
   try {
-    const token = UserController.signin(req.user);
+    const token = Users.signin(req.user);
     res.json({ token, email: req.user.email });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
@@ -107,7 +137,7 @@ router.post('/signin', requireSignin, async (req, res) => {
 
 router.post('/signup', async (req, res) => {
   try {
-    const token = await UserController.signup(req.body);
+    const token = await Users.signup(req.body);
     res.json({ token, email: req.body.email });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
