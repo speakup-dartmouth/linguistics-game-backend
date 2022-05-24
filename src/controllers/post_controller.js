@@ -42,8 +42,7 @@ export async function getPosts(query) {
       const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture');
     }
   }
-
-  // await finding posts
+  
   const posts = await Post.find().populate('author', 'username profilePicture');
   // return posts
   return posts;
