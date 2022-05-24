@@ -27,6 +27,10 @@ const UserSchema = new Schema({
   timestamps: true,
 });
 
+UserSchema.index({
+  username: 'text',
+});
+
 UserSchema.pre('save', async function beforeUserSave(next) {
   // get access to the user model
   const user = this;

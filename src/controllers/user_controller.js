@@ -16,7 +16,13 @@ export async function getUser(id, query) {
   return user;
 }
 
-export async function getUsers() {
+export async function getUsers(query) {
+  // return searched for users if searchTerm exists
+  if ('searchTerm' in query) {
+    const posts = await User.find({ "username": { $regex: query.searchTerm, $options: 'i' }});
+    return posts;
+  }
+
   const users = await User.find();
   return users;
 }
