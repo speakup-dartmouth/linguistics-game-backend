@@ -51,7 +51,6 @@ export async function getPosts(query) {
 
   // return all posts
   const posts = await Post.find().populate('author', 'username profilePicture');
-  // return posts
   return posts;
 }
 export async function getPost(id) {
