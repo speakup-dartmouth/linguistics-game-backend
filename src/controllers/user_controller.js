@@ -1,12 +1,15 @@
 import jwt from 'jwt-simple';
 import dotenv from 'dotenv';
 import User from '../models/user_model';
-import Post from '../models/post_model';
 
 dotenv.config({ silent: true });
 
-export async function getUser(id) {
+export async function getUser(id, query) {
   const user = await User.findById(id);
+
+  // if ('collection-type' in query) {
+  // }
+
   if (!user) {
     throw new Error('user not found');
   }
@@ -32,20 +35,6 @@ export async function updateUser(id, userFields) {
 export async function deleteUser(id) {
   await User.findByIdAndDelete(id);
   return { msg: `user ${id} deleted successfully.` };
-}
-
-
-export async function getHomePosts(id) {
-  const user = await getUser(id);
-  const following = user.following;
-
-  const posts = await Post.find({author: {$in: following}});
-  return posts;
-}
-
-export async function getOwnPosts(id) {
-  const posts = await Post.find({author: {$in: id}});
-  return posts;
 }
 
 export const signin = (user) => {

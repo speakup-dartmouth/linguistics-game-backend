@@ -9,7 +9,7 @@ const CollectionSchema = new Schema({
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
 }, {
   toObject: { virtuals: true },
-  toJSON: { virtuals: true }
+  toJSON: { virtuals: true },
 });
 
 const UserSchema = new Schema({
@@ -18,8 +18,8 @@ const UserSchema = new Schema({
   bio: { type: String },
   password: { type: String },
   profilePicture: String,
-  following: { type: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}] },
-  followers: { type: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}] },
+  following: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] },
+  followers: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] },
   collections: [CollectionSchema],
 }, {
   toObject: { virtuals: true },

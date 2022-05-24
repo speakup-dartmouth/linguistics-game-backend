@@ -28,14 +28,8 @@ router.route('/posts')
   })
   .get(async (req, res) => {
     try {
-      const query = req.query.q;
-      if (query) {
-        const result = await Posts.findPosts(query);
-        res.json(result);
-      } else {
-        const result = await Posts.getPosts();
-        res.json(result);
-      }
+      const result = await Posts.getPosts(req.query);
+      res.json(result);
     } catch (error) {
       res.status(404).json({ error });
     }
@@ -80,20 +74,20 @@ router.route('/users')
 router.route('/users/:id')
   .get(async (req, res) => {
     try {
-      const id = req.params.id;
-      const result = await Users.getUser(id);
+      const { id } = req.params;
+      const result = await Users.getUser(id, req.query);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error });
     }
   })
   .put(async (req, res) => {
-      try {
-        const result = await Users.updateUser(req.params.id, req.body);
-        res.json(result);
-      } catch (error) {
-        res.status(500).json({ error });
-      }
+    try {
+      const result = await Users.updateUser(req.params.id, req.body);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
   })
   .delete(async (req, res) => {
     try {
@@ -102,28 +96,6 @@ router.route('/users/:id')
     } catch (error) {
       res.status(401).json({ error });
     }
-  });
-
-  router.route('/users/:id/home-posts')
-    .get(async (req, res) => {
-      try {
-        const id = req.params.id;
-        const result = await Users.getHomePosts(id);
-        res.json(result);
-      } catch (error) {
-        res.status(404).json({ error });
-      }
-  });
-
-  router.route('/users/:id/own-posts')
-    .get(async (req, res) => {
-      try {
-        const id = req.params.id;
-        const result = await Users.getOwnPosts(id);
-        res.json(result);
-      } catch (error) {
-        res.status(404).json({ error });
-      }
   });
 
 router.post('/signin', requireSignin, async (req, res) => {
@@ -143,7 +115,6 @@ router.post('/signup', async (req, res) => {
     res.status(422).send({ error: error.toString() });
   }
 });
-  
 
 router.get('/sign-s3', signS3);
 

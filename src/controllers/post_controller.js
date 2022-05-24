@@ -1,9 +1,11 @@
 import Post from '../models/post_model';
+import User from '../models/user_model';
 
 export async function createPost(postFields) {
   // await creating a post
   const post = new Post();
   post.title = postFields.title;
+  post.description = postFields.description;
   post.type = postFields.type;
   post.tags = postFields.tags;
   post.recipe = postFields.recipe;
@@ -25,7 +27,22 @@ export async function createPost(postFields) {
     throw new Error(`create post error: ${error}`);
   }
 }
-export async function getPosts() {
+export async function getPosts(query) {
+  if ('user' in query) {
+    const user = await User.findById(query.user);
+    if (!user) {
+      throw new Error('user not found');
+    }
+    // get posts that the user is following
+    if ('following' in query && query.following === 'true') {
+      const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture');
+      return posts;
+    // get user's posts
+    } else {
+      const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture');
+    }
+  }
+
   // await finding posts
   const posts = await Post.find().populate('author', 'username profilePicture');
   // return posts
