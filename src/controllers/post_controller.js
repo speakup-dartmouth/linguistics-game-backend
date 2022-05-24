@@ -12,7 +12,7 @@ export async function createPost(postFields) {
   post.difficulty = postFields.difficulty;
   post.time = postFields.time;
   post.featuredImage = postFields.featuredImage;
-  post.images = postFields.imagese;
+  post.images = postFields.images;
   post.video = postFields.video;
   post.recipeUrl = postFields.recipeUrl;
   post.likes = postFields.likes;
@@ -28,6 +28,11 @@ export async function createPost(postFields) {
   }
 }
 export async function getPosts(query) {
+  if ('searchTerm' in query) {
+    const posts = await Post.find({ $text: { $search: query.searchTerm } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+    return posts;
+  }
+
   if ('user' in query) {
     const user = await User.findById(query.user);
     if (!user) {
@@ -35,15 +40,16 @@ export async function getPosts(query) {
     }
     // get posts that the user is following
     if ('following' in query && query.following === 'true') {
-      const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture');
+      const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
       return posts;
     // get user's posts
     } else {
-      const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture');
+      const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+      return posts;
     }
   }
 
-  // await finding posts
+  // return all posts
   const posts = await Post.find().populate('author', 'username profilePicture');
   // return posts
   return posts;

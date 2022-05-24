@@ -27,6 +27,8 @@ signup: POST http://munch-api.onrender.com/api/signup
 Body: {"email": email,"password": password}
 
 getUsers: GET http://munch-api.onrender.com/api/users
+Optional query param - searchTerm: (searchTerm)
+Returns searched for users, searches through usernames
 
 getUser: GET http://munch-api.onrender.com/api/users/:id
 
@@ -39,8 +41,8 @@ createPost: POST http://munch-api.onrender.com/api/posts
 Body: {fields}
 
 getPosts: GET http://munch-api.onrender.com/api/posts
-Optional query params - user: id, following: true
-If user id is passed in paramater and following is true, then posts of the user's home page are returned (posts of users that the user is following). If user id is passed in without following, then the user's own posts are returned.
+Optional query params - user: (userId), following: (true), searchTerm: (searchTerm)
+If user id is passed in paramater and following is true, then posts of the user's home page are returned (posts of users that the user is following). If user id is passed in without following, then the user's own posts are returned. Searchterm is used to search for posts. It cannot be combined with the other params.
 
 getPost: GET http://munch-api.onrender.com/api/posts/:id
 

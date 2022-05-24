@@ -64,7 +64,7 @@ router.route('/posts/:postID')
 router.route('/users')
   .get(async (req, res) => {
     try {
-      const result = await Users.getUsers();
+      const result = await Users.getUsers(req.query);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error });
