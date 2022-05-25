@@ -5,57 +5,17 @@ import User from '../models/user_model';
 dotenv.config({ silent: true });
 
 export async function getUser(id, query) {
-  if ('collection_type' in query) {
-    if (query.collection_type === 'date') {
-      const user = await User.findById(id).populate('savedPosts');
-
-      if (!user) {
-        throw new Error('user not found');
-      }
-
-      // sort by createdAt, most recent is at beginning of list
-      user.savedPosts.sort((a, b) => b.createdAt - a.createdAt);
-      return user;
-
-    } else if (query.collection_type === 'difficulty') {
-      const user = await User.findById(id).populate('savedPosts');
-
-      if (!user) {
-        throw new Error('user not found');
-      }
-
-      // sort by difficulty, easiest is at beginning of list
-      user.savedPosts.sort((a, b) => a.difficulty - b.difficulty);
-      return user;
-
-    } else if (query.collection_type === 'search') {
-      if (!('search_term' in query)) {
-        throw new Error('Please enter a search_term');
-      }
-      const user = await User.findById(id).populate('savedPosts');
-
-      // only include savedPosts that contain the search term
-      user.savedPosts = user.savedPosts.filter(post => (post.title != null && post.title.includes(query.search_term))
-        || (post.type != null && post.type.includes(query.search_term)) || (post.tags != null && post.tags.includes(query.search_term))
-        || (post.recipe != null && post.recipie.includes(query.search_term)));
-      return user;
-    } else {
-      throw new Error('Please provide a valid collection-type query value');
-    }
-  } else {
-    const user = await User.findById(id);
-    if (!user) {
-      throw new Error('user not found');
-    }
-    return user;
+  const user = await User.findById(id);
+  if (!user) {
+    throw new Error('user not found');
   }
-  
+  return user;
 }
 
 export async function getUsers(query) {
   // return searched for users if search_term exists
   if ('search_term' in query) {
-    const posts = await User.find({ "username": { $regex: query.search_term, $options: 'i' }});
+    const posts = await User.find({ username: { $regex: query.search_term, $options: 'i' } });
     return posts;
   }
 
@@ -65,7 +25,6 @@ export async function getUsers(query) {
 
 export async function updateUser(id, userFields) {
   try {
-    console.log(userFields.collections);
     const user = await User.findByIdAndUpdate(id, userFields, { returnDocument: 'after' });
     return user;
   } catch (error) {
@@ -77,6 +36,68 @@ export async function updateUser(id, userFields) {
 export async function deleteUser(id) {
   await User.findByIdAndDelete(id);
   return { msg: `user ${id} deleted successfully.` };
+}
+
+export async function getCollections(id, query) {
+  if ('collection_type' in query) {
+    if (query.collection_type === 'date') {
+      const user = await User.findById(id).populate({ path: 'collections.posts' });
+
+      if (!user) {
+        throw new Error('user not found');
+      }
+
+      let savedPosts = [];
+      user.collections.forEach((collection) => {
+        savedPosts = savedPosts.concat(collection.posts);
+      });
+
+      // sort by createdAt, most recent is at beginning of list
+      savedPosts.sort((a, b) => { return b.createdAt - a.createdAt; });
+      return savedPosts;
+    } else if (query.collection_type === 'difficulty') {
+      const user = await User.findById(id).populate({ path: 'collections.posts' });
+
+      if (!user) {
+        throw new Error('user not found');
+      }
+
+      let savedPosts = [];
+      user.collections.forEach((collection) => {
+        savedPosts = savedPosts.concat(collection.posts);
+      });
+
+      // sort by difficulty, most easy is at beginning of list
+      savedPosts.sort((a, b) => { return a.difficulty - b.difficulty; });
+      return savedPosts;
+    } else if (query.collection_type === 'search') {
+      if (!('search_term' in query)) {
+        throw new Error('Please enter a search_term');
+      }
+      const user = await User.findById(id).populate({ path: 'collections.posts' });
+
+      if (!user) {
+        throw new Error('user not found');
+      }
+
+      let savedPosts = [];
+      user.collections.forEach((collection) => {
+        savedPosts = savedPosts.concat(collection.posts);
+      });
+
+      // only include savedPosts that contain the search term
+      savedPosts = savedPosts.filter((post) => {
+        return (post.title != null && post.title.includes(query.search_term))
+        || (post.type != null && post.type.includes(query.search_term)) || (post.tags != null && post.tags.includes(query.search_term))
+        || (post.recipe != null && post.recipie.includes(query.search_term));
+      });
+      return savedPosts;
+    } else {
+      throw new Error('Please provide a valid collection_type query value');
+    }
+  } else {
+    throw new Error('Please provide a collection_type query');
+  }
 }
 
 export const signin = (user) => {

@@ -98,6 +98,16 @@ router.route('/users/:id')
     }
   });
 
+router.route('/users/:id/collections')
+  .get(async (req, res) => {
+    try {
+      const result = await Users.getCollections(req.params.id, req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
+
 router.post('/signin', requireSignin, async (req, res) => {
   try {
     const token = Users.signin(req.user);
