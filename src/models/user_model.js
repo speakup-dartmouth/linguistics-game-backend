@@ -18,8 +18,9 @@ const UserSchema = new Schema({
   bio: { type: String },
   password: { type: String },
   profilePicture: String,
-  following: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] },
-  followers: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] },
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
   collections: [CollectionSchema],
 }, {
   toObject: { virtuals: true },
