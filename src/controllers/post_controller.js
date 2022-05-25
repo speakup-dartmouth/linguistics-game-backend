@@ -38,13 +38,22 @@ export async function getPosts(query) {
     if (!user) {
       throw new Error('user not found');
     }
-    // get posts that the user is following
-    if ('following' in query && query.following === 'true') {
-      const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
-      return posts;
+    // get posts from user's home (posts that user is following)
+    if ('home' in query) {
+      // get all posts from following
+      if (query.home === 'all') {
+        const posts = await Post.find({ author: { $in: user.following } } ).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        return posts;
+      // get only unviewed posts
+      } else if (query.home === 'unviewed') { 
+        const posts = await Post.find({ author: { $in: user.following }, _id: { $nin: user.viewedPosts } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        return posts;
+      } else {
+        throw new Error('please provide a valid home query value');
+      }
     // get user's posts
     } else {
-      const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+      const posts = await Post.find({ author: { $in: user.id }}).populate('author', 'username profilePicture').sort({ createdAt: -1 });
       return posts;
     }
   }

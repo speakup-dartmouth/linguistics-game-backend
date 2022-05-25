@@ -1,13 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 
 const CommentSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  content: String,
+  content: { type: String, required: true },
   post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
@@ -27,7 +23,6 @@ const PostSchema = new Schema({
   time: Number,
   featuredImage: String,
   images: [String],
-  video: String,
   recipeURL: String,
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [CommentSchema],
