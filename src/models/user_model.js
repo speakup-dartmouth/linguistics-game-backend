@@ -20,7 +20,6 @@ const UserSchema = new Schema({
   profilePicture: String,
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
   collections: [CollectionSchema],
 }, {
   toObject: { virtuals: true },
