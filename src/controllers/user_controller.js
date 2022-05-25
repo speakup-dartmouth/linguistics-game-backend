@@ -70,6 +70,15 @@ export async function getCollections(id, query) {
       // sort by difficulty, most easy is at beginning of list
       savedPosts.sort((a, b) => { return a.difficulty - b.difficulty; });
       return savedPosts;
+    } else if (query.collection_type === 'collections') {
+      const user = await User.findById(id).populate({ path: 'collections.posts' });
+
+      if (!user) {
+        throw new Error('user not found');
+      }
+
+      return user.collections;
+    
     } else if (query.collection_type === 'search') {
       if (!('search_term' in query)) {
         throw new Error('Please enter a search_term');
