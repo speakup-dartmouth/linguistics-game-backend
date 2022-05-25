@@ -31,8 +31,6 @@ Optional query param - search_term: (search_term)
 Returns searched for users, searches through usernames
 
 getUser: GET http://munch-api.onrender.com/api/users/:id
-Optional query param - collection_type
-To sort savedPosts by date, set collection_type = date, to sort savedPosts by difficulty, set collection_type = difficulty, to search through savedPosts, set collection_type = search. To search, must also include search_term query.
 
 updateUser: PUT http://munch-api.onrender.com/api/users/:id
 Body: {fields}
@@ -52,6 +50,10 @@ deletePost: DELETE http://munch-api.onrender.com/api/posts/:id
 
 updatePost: PUT http://munch-api.onrender.com/api/posts/:id
 Body: {fields}
+
+getCollections: GET http://munch-api.onrender.com/api/posts/:id/collections
+Required query param - collection_type
+To sort savedPosts by date, set collection_type = date, to sort savedPosts by difficulty, set collection_type = difficulty, to search through savedPosts, set collection_type = search. To search, must also include search_term query.
 
 ## Authors
 
