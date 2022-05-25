@@ -5,21 +5,57 @@ import User from '../models/user_model';
 dotenv.config({ silent: true });
 
 export async function getUser(id, query) {
-  const user = await User.findById(id);
+  if ('collection_type' in query) {
+    if (query.collection_type === 'date') {
+      const user = await User.findById(id).populate('savedPosts');
 
-  // if ('collection-type' in query) {
-  // }
+      if (!user) {
+        throw new Error('user not found');
+      }
 
-  if (!user) {
-    throw new Error('user not found');
+      // sort by createdAt, most recent is at beginning of list
+      user.savedPosts.sort((a, b) => b.createdAt - a.createdAt);
+      return user;
+
+    } else if (query.collection_type === 'difficulty') {
+      const user = await User.findById(id).populate('savedPosts');
+
+      if (!user) {
+        throw new Error('user not found');
+      }
+
+      // sort by difficulty, easiest is at beginning of list
+      user.savedPosts.sort((a, b) => a.difficulty - b.difficulty);
+      return user;
+
+    } else if (query.collection_type === 'search') {
+      if (!('search_term' in query)) {
+        throw new Error('Please enter a search_term');
+      }
+      const user = await User.findById(id).populate('savedPosts');
+
+      // only include savedPosts that contain the search term
+      user.savedPosts = user.savedPosts.filter(post => (post.title != null && post.title.includes(query.search_term))
+        || (post.type != null && post.type.includes(query.search_term)) || (post.tags != null && post.tags.includes(query.search_term))
+        || (post.recipe != null && post.recipie.includes(query.search_term)));
+      return user;
+    } else {
+      throw new Error('Please provide a valid collection-type query value');
+    }
+  } else {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new Error('user not found');
+    }
+    return user;
   }
-  return user;
+  
 }
 
 export async function getUsers(query) {
-  // return searched for users if searchTerm exists
-  if ('searchTerm' in query) {
-    const posts = await User.find({ "username": { $regex: query.searchTerm, $options: 'i' }});
+  // return searched for users if search_term exists
+  if ('search_term' in query) {
+    const posts = await User.find({ "username": { $regex: query.search_term, $options: 'i' }});
     return posts;
   }
 

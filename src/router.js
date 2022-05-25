@@ -23,7 +23,7 @@ router.route('/posts')
       const result = await Posts.createPost(req.body, req.user);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(500).json({ error: error.toString() });
     }
   })
   .get(async (req, res) => {
@@ -31,7 +31,7 @@ router.route('/posts')
       const result = await Posts.getPosts(req.query);
       res.json(result);
     } catch (error) {
-      res.status(404).json({ error });
+      res.status(404).json({ error: error.toString() });
     }
   });
 
@@ -41,7 +41,7 @@ router.route('/posts/:postID')
       const result = await Posts.getPost(req.params.postID);
       res.json(result);
     } catch (error) {
-      res.status(404).json({ error });
+      res.status(404).json({ error: error.toString() });
     }
   })
   .put(async (req, res) => {
@@ -49,7 +49,7 @@ router.route('/posts/:postID')
       const result = await Posts.updatePost(req.params.postID, req.body);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(500).json({ error: error.toString() });
     }
   })
   .delete(async (req, res) => {
@@ -57,7 +57,7 @@ router.route('/posts/:postID')
       const result = await Posts.deletePost(req.params.postID);
       res.json(result);
     } catch (error) {
-      res.status(401).json({ error });
+      res.status(401).json({ error: error.toString() });
     }
   });
 
@@ -67,7 +67,7 @@ router.route('/users')
       const result = await Users.getUsers(req.query);
       res.json(result);
     } catch (error) {
-      res.status(404).json({ error });
+      res.status(404).json({ error: error.toString() });
     }
   });
 
@@ -78,7 +78,7 @@ router.route('/users/:id')
       const result = await Users.getUser(id, req.query);
       res.json(result);
     } catch (error) {
-      res.status(404).json({ error });
+      res.status(404).json({ error: error.toString() });
     }
   })
   .put(async (req, res) => {
@@ -86,7 +86,7 @@ router.route('/users/:id')
       const result = await Users.updateUser(req.params.id, req.body);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(500).json({ error: error.toString() });
     }
   })
   .delete(async (req, res) => {
@@ -94,7 +94,7 @@ router.route('/users/:id')
       const result = await Users.deleteUser(req.params.id);
       res.json(result);
     } catch (error) {
-      res.status(401).json({ error });
+      res.status(401).json({ error: error.toString() });
     }
   });
 

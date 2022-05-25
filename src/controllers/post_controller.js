@@ -28,8 +28,8 @@ export async function createPost(postFields) {
   }
 }
 export async function getPosts(query) {
-  if ('searchTerm' in query) {
-    const posts = await Post.find({ $text: { $search: query.searchTerm } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+  if ('search_term' in query) {
+    const posts = await Post.find({ $text: { $search: query.search_term } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
     return posts;
   }
 

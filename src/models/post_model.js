@@ -39,7 +39,7 @@ const PostSchema = new Schema({
 });
 
 PostSchema.index({
-  title: 'text', type: 'text', tags: 'text', author: 'text',
+  title: 'text', type: 'text', tags: 'text', recipe: 'text',
 });
 const PostModel = mongoose.model('Post', PostSchema);
 
