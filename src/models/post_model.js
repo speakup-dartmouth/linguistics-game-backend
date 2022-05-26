@@ -1,5 +1,22 @@
 import mongoose, { Schema } from 'mongoose';
 
+const IngredientSchema = new Schema({
+  ingredientName: String,
+  quantity: mongoose.Types.Decimal128,
+  unit: String,
+}, {
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+});
+
+const RecipeSchema = new Schema({
+  steps: [String],
+  ingredients: [IngredientSchema]
+}, {
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+});
+
 const CommentSchema = new Schema({
   content: { type: String, required: true },
   post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
@@ -18,7 +35,7 @@ const PostSchema = new Schema({
   description: String,
   type: String,
   tags: [String],
-  recipe: String,
+  recipe: RecipeSchema,
   difficulty: Number,
   time: Number,
   featuredImage: String,

@@ -129,6 +129,10 @@ export const signup = async ({ email, password }) => {
   const user = new User();
   user.email = email;
   user.password = password;
+  user.termFrequency =  {title: new Map(),
+                          ingredients: new Map(),
+                          difficulty: new Map(),
+                          tags: new Map()};
   await user.save();
   return tokenForUser(user);
 };

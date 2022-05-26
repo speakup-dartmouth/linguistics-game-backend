@@ -51,6 +51,22 @@ export async function getPosts(query) {
       } else {
         throw new Error('please provide a valid home query value');
       }
+    } else if ('discovery' in query) {
+      // return posts sorted by most liked that are not made by the user
+      if (query.discovery === 'hot') {
+        const posts = await Post.find(({ author: { $nin: user.id }}));
+        posts.sort((a, b) => b.likes.length - a.likes.length);
+        return posts;
+      } else if (query.discovery === 'recommended') {
+        const posts = await Post.find({ author: { $in: user.following }, author: { $ne: user }, _id: { $nin: user.viewedPosts } });
+        posts.sort((a, b) => 
+          {
+            aScore = 0;
+            
+            b.likes.length - a.likes.length;
+          });
+        return posts;
+      }
     // get user's posts
     } else {
       const posts = await Post.find({ author: { $in: user.id }}).populate('author', 'username profilePicture').sort({ createdAt: -1 });
@@ -77,10 +93,56 @@ export async function deletePost(id) {
   // return confirmation
   return { msg: `post ${id} deleted successfully.` };
 }
-export async function updatePost(id, postFields) {
+export async function updatePost(id, query, postFields) {
   try {
-    // await updating a post by id
     const post = await Post.findByIdAndUpdate(id, postFields, { returnDocument: 'after' });
+
+    // await updating a post by id
+    if ('update_type' in query) {
+      if (query.update_type == 'like') {
+        const user = await User.findById(query.user);
+        const titleWords = post.title.split(' ');
+        titleWords.forEach((word) => {
+          if (!user.termFrequency.title.has(word)) {
+            user.termFrequency.title.set(word, 0);
+          }
+          user.termFrequency.title.set(word, user.termFrequency.title.get(word) + 1);
+          user.termFrequency.titleCount += 1;
+        });
+
+        if (post.type != null) {
+          const typeWords = post.title.split(' ');
+          typeWords.forEach((word) => {
+            if (!user.termFrequency.type.has(word)) {
+              user.termFrequency.type.set(word, 0);
+            }
+            user.termFrequency.type.set(word, user.termFrequency.type.get(word) + 1);
+            user.termFrequency.typeCount += 1;
+          });
+        }
+
+        if (post.recipe != null) {
+          post.recipe.ingredients.forEach((ingredient) => {
+            if (!user.termFrequency.ingredients.has(ingredient.ingredientName)) {
+              user.termFrequency.ingredients.set(ingredient.ingredientName, 0);
+            }
+            user.termFrequency.ingredients.set(ingredient.ingredientName, 
+              user.termFrequency.ingredients.get(ingredient.ingredientName) + 1);
+            user.termFrequency.ingredientsCount += 1;
+          });
+        }
+        
+        const difficulties = ['easy', 'medium', 'hard'];
+        if (!user.termFrequency.difficulty.has(difficulties[post.difficulty - 1])) {
+          user.termFrequency.difficulty.set(difficulties[post.difficulty - 1], 0);
+        }
+        user.termFrequency.difficulty.set(difficulties[post.difficulty - 1], user.termFrequency.difficulty.get(difficulties[post.difficulty - 1]) + 1);
+        user.termFrequency.difficultyCount += 1;
+        console.log(user);
+        user.save();
+      }
+    }
+    
     // return *updated* post
     return post;
   } catch (error) {

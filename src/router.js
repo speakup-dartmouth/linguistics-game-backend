@@ -46,7 +46,7 @@ router.route('/posts/:postID')
   })
   .put(async (req, res) => {
     try {
-      const result = await Posts.updatePost(req.params.postID, req.body);
+      const result = await Posts.updatePost(req.params.postID, req.query, req.body);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
