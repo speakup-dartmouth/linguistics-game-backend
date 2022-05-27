@@ -55,7 +55,7 @@ export async function getPosts(query) {
     } else if ('discovery' in query) {
       // return posts sorted by most liked that are not made by the user
       if (query.discovery === 'hot') {
-        const posts = await Post.find(({ author: { $ne: user.id } }).sort({ likeCount: -1 }));
+        const posts = await Post.find({ author: { $ne: user.id } }).sort({ likeCount: -1 });
         return posts;
       } else if (query.discovery === 'recommended') {
         const sortedTags = [...user.likedTags.entries()].sort((a, b) => { return b[1] - a[1]; });
