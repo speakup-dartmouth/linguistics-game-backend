@@ -41,8 +41,8 @@ createPost: POST http://munch-api.onrender.com/api/posts
 Body: {fields}
 
 getPosts: GET http://munch-api.onrender.com/api/posts
-Optional query params - user: (userId), following: (true), search_term: (search_term), discovery: (hot, recommended)
-If user id is passed in paramater and following is true, then posts of the user's home page are returned (posts of users that the user is following). If user id is passed in without following, then the user's own posts are returned. If user id is passed in with discovery, if discovery equals hot, then the most like posts are returned. If discovery equals recommended, the posts that are recommended for the user are returned. search_term is used to search for posts. It cannot be combined with the other params.
+Optional query params - user: (userId), following: (true), search_term: (search_term), home: (all, unviewed) discovery: (hot, recommended)
+If user id is passed in paramater and following is true, then posts of the user's home page are returned (posts of users that the user is following). If user id is passed in without following, then the user's own posts are returned. If user id is passed in with discovery, if discovery equals hot, then the most like posts are returned. If discovery equals recommended, the posts that are recommended for the user are returned. If user id is passed in with home, then if home equals all, then all posts are returned from users that the user follows. If home equals unviewed, then only unviewed posts are returned. search_term is used to search for posts. It cannot be combined with the other params.
 
 getPost: GET http://munch-api.onrender.com/api/posts/:id
 
