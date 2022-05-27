@@ -113,9 +113,9 @@ export const signin = (user) => {
 };
 
 // note the lovely destructuring here indicating that we are passing in an object with these 3 keys
-export const signup = async ({ email, password }) => {
-  if (!email || !password) {
-    throw new Error('You must provide email and password');
+export const signup = async ({ username, email, password }) => {
+  if (!usernamne ||!email || !password) {
+    throw new Error('You must provide username, email and password');
   }
 
   // See if a user with the given email exists
@@ -126,6 +126,7 @@ export const signup = async ({ email, password }) => {
   }
 
   const user = new User();
+  user.username = username;
   user.email = email;
   user.password = password;
   user.likedTags = new Map();
