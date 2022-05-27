@@ -15,12 +15,14 @@ const CollectionSchema = new Schema({
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
   username: { type: String, unique: true, lowercase: true },
-  bio: { type: String },
-  password: { type: String },
+  bio: String,
+  password: String,
   profilePicture: String,
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  viewedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
   collections: [CollectionSchema],
+  likedTags: { type: Map, of: Number },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },

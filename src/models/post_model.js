@@ -1,13 +1,26 @@
 import mongoose, { Schema } from 'mongoose';
 
+const IngredientSchema = new Schema({
+  ingredientName: String,
+  quantity: mongoose.Types.Decimal128,
+  unit: String,
+}, {
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+});
+
+const RecipeSchema = new Schema({
+  steps: [String],
+  ingredients: [IngredientSchema],
+}, {
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+});
+
 const CommentSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  content: String,
+  content: { type: String, required: true },
   post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
@@ -22,16 +35,16 @@ const PostSchema = new Schema({
   description: String,
   type: String,
   tags: [String],
-  recipe: String,
+  recipe: RecipeSchema,
   difficulty: Number,
   time: Number,
   featuredImage: String,
   images: [String],
-  video: String,
   recipeURL: String,
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [CommentSchema],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  likeCount: Number,
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },

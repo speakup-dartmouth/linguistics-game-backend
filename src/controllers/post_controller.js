@@ -19,6 +19,7 @@ export async function createPost(postFields) {
   post.comments = postFields.comments;
   post.tags = postFields.tags;
   post.author = postFields.author;
+  post.likeCount = 0;
   // return post
   try {
     const savedpost = await post.save();
@@ -38,10 +39,55 @@ export async function getPosts(query) {
     if (!user) {
       throw new Error('user not found');
     }
-    // get posts that the user is following
-    if ('following' in query && query.following === 'true') {
-      const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
-      return posts;
+    // get posts from user's home (posts that user is following)
+    if ('home' in query) {
+      // get all posts from following
+      if (query.home === 'all') {
+        const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        return posts;
+      // get only unviewed posts
+      } else if (query.home === 'unviewed') {
+        const posts = await Post.find({ author: { $in: user.following }, _id: { $nin: user.viewedPosts } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        return posts;
+      } else {
+        throw new Error('please provide a valid home query value');
+      }
+    } else if ('discovery' in query) {
+      // return posts sorted by most liked that are not made by the user
+      if (query.discovery === 'hot') {
+        const posts = await Post.find(({ author: { $ne: user.id } }).sort({ likeCount: -1 }));
+        return posts;
+      } else if (query.discovery === 'recommended') {
+        const sortedTags = [...user.likedTags.entries()].sort((a, b) => { return b[1] - a[1]; });
+        const promises = [];
+        const recommended = [];
+        for (let i = 0; i < Math.min(7, sortedTags.length); i += 1) {
+          promises.push(new Promise((resolve, reject) => {
+            try {
+              const func = async () => {
+                const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user.id, $nin: user.following }, _id: { $nin: user.viewedPosts } }).sort({ likeCount: -1 });
+                return { tag: sortedTags[i][0], posts };
+              };
+              const result = func();
+              resolve(result);
+            } catch (error) {
+              reject(error);
+            }
+          }));
+        }
+
+        await Promise.all(promises).then((result) => {
+          result.map(({ tag, posts }) => {
+            return (
+              recommended.push({ tag, posts })
+            );
+          });
+        });
+
+        return recommended;
+      } else {
+        throw new Error('please provide a valid discovery query value');
+      }
     // get user's posts
     } else {
       const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
@@ -68,10 +114,35 @@ export async function deletePost(id) {
   // return confirmation
   return { msg: `post ${id} deleted successfully.` };
 }
-export async function updatePost(id, postFields) {
+export async function updatePost(id, query, postFields) {
   try {
-    // await updating a post by id
     const post = await Post.findByIdAndUpdate(id, postFields, { returnDocument: 'after' });
+
+    // await updating a post by id
+    if ('update_type' in query) {
+      if (query.update_type === 'like') {
+        const user = await User.findById(query.user);
+        post.tags.forEach((tag) => {
+          if (!user.likedTags.has(tag)) {
+            user.likedTags.set(tag, 0);
+          }
+          user.likedTags.set(tag, user.likedTags.get(tag) + 1);
+        });
+
+        user.save();
+      }
+    } else if (query.update_type === 'dislike') {
+      const user = await User.findById(query.user);
+      post.tags.forEach((tag) => {
+        if (!user.likedTags.has(tag)) {
+          user.likedTags.set(tag, 0);
+        }
+        user.likedTags.set(tag, user.likedTags.get(tag) - 1);
+      });
+
+      user.save();
+    }
+
     // return *updated* post
     return post;
   } catch (error) {
