@@ -66,7 +66,7 @@ export async function getPosts(query) {
             try {
               const func = async () => {
                 const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user.id, $nin: user.following }, _id: { $nin: user.viewedPosts } }).sort({ likeCount: -1 });
-                return { tag: sortedTags[i][0], posts: posts };
+                return { tag: sortedTags[i][0], posts };
               };
               const result = func();
               resolve(result);
@@ -76,12 +76,13 @@ export async function getPosts(query) {
           }));
         }
 
-        await Promise.all(promises).then((result) => { 
-          result.map(({tag, posts}) => {
-            recommended.push({tag: tag, posts: posts })
-          })
-        }
-        );
+        await Promise.all(promises).then((result) => {
+          result.map(({ tag, posts }) => {
+            return (
+              recommended.push({ tag, posts })
+            );
+          });
+        });
 
         return recommended;
       } else {
