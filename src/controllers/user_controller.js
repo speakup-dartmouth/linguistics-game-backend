@@ -78,7 +78,6 @@ export async function getCollections(id, query) {
       }
 
       return user.collections;
-    
     } else if (query.collection_type === 'search') {
       if (!('search_term' in query)) {
         throw new Error('Please enter a search_term');
@@ -129,10 +128,7 @@ export const signup = async ({ email, password }) => {
   const user = new User();
   user.email = email;
   user.password = password;
-  user.termFrequency =  {title: new Map(),
-                          ingredients: new Map(),
-                          difficulty: new Map(),
-                          tags: new Map()};
+  user.likedTags = new Map();
   await user.save();
   return tokenForUser(user);
 };

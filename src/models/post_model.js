@@ -11,7 +11,7 @@ const IngredientSchema = new Schema({
 
 const RecipeSchema = new Schema({
   steps: [String],
-  ingredients: [IngredientSchema]
+  ingredients: [IngredientSchema],
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
@@ -44,6 +44,7 @@ const PostSchema = new Schema({
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [CommentSchema],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  likeCount: Number,
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },

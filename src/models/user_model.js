@@ -12,22 +12,6 @@ const CollectionSchema = new Schema({
   toJSON: { virtuals: true },
 });
 
-const TermFrequencySchema = new Schema({
-  title: {type: Map, of: Number},
-  titleCount: Number,
-  ingredients: {type: Map, of: Number},
-  ingredientsCount: Number,
-  difficulty: {type: Map, of: Number},
-  difficultyCount: Number,
-  type: {type: Map, of: Number},
-  typeCount: Number,
-  tags: {type: Map, of: Number},
-  tagsCount: Number
-}, {
-  toObject: { virtuals: true },
-  toJSON: { virtuals: true },
-});
-
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
   username: { type: String, unique: true, lowercase: true },
@@ -38,7 +22,7 @@ const UserSchema = new Schema({
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   viewedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
   collections: [CollectionSchema],
-  termFrequency: TermFrequencySchema,
+  likedTags: { type: Map, of: Number },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },

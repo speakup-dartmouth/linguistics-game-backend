@@ -19,6 +19,7 @@ export async function createPost(postFields) {
   post.comments = postFields.comments;
   post.tags = postFields.tags;
   post.author = postFields.author;
+  post.likeCount = 0;
   // return post
   try {
     const savedpost = await post.save();
@@ -42,10 +43,10 @@ export async function getPosts(query) {
     if ('home' in query) {
       // get all posts from following
       if (query.home === 'all') {
-        const posts = await Post.find({ author: { $in: user.following } } ).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
         return posts;
       // get only unviewed posts
-      } else if (query.home === 'unviewed') { 
+      } else if (query.home === 'unviewed') {
         const posts = await Post.find({ author: { $in: user.following }, _id: { $nin: user.viewedPosts } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
         return posts;
       } else {
@@ -54,22 +55,41 @@ export async function getPosts(query) {
     } else if ('discovery' in query) {
       // return posts sorted by most liked that are not made by the user
       if (query.discovery === 'hot') {
-        const posts = await Post.find(({ author: { $nin: user.id }}));
-        posts.sort((a, b) => b.likes.length - a.likes.length);
+        const posts = await Post.find(({ author: { $ne: user.id } }).sort({ likeCount: -1 }));
         return posts;
       } else if (query.discovery === 'recommended') {
-        const posts = await Post.find({ author: { $in: user.following }, author: { $ne: user }, _id: { $nin: user.viewedPosts } });
-        posts.sort((a, b) => 
-          {
-            aScore = 0;
-            
-            b.likes.length - a.likes.length;
-          });
-        return posts;
+        const sortedTags = [...user.likedTags.entries()].sort((a, b) => { return b[1] - a[1]; });
+        const promises = [];
+        const recommended = [];
+        for (let i = 0; i < Math.min(7, sortedTags.length); i += 1) {
+          promises.push(new Promise((resolve, reject) => {
+            try {
+              const func = async () => {
+                const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user.id, $nin: user.following }, _id: { $nin: user.viewedPosts } }).sort({ likeCount: -1 });
+                return { tag: sortedTags[i][0], posts: posts };
+              };
+              const result = func();
+              resolve(result);
+            } catch (error) {
+              reject(error);
+            }
+          }));
+        }
+
+        await Promise.all(promises).then((result) => { 
+          result.map(({tag, posts}) => {
+            recommended.push({tag: tag, posts: posts })
+          })
+        }
+        );
+
+        return recommended;
+      } else {
+        throw new Error('please provide a valid discovery query value');
       }
     // get user's posts
     } else {
-      const posts = await Post.find({ author: { $in: user.id }}).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+      const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
       return posts;
     }
   }
@@ -99,50 +119,29 @@ export async function updatePost(id, query, postFields) {
 
     // await updating a post by id
     if ('update_type' in query) {
-      if (query.update_type == 'like') {
+      if (query.update_type === 'like') {
         const user = await User.findById(query.user);
-        const titleWords = post.title.split(' ');
-        titleWords.forEach((word) => {
-          if (!user.termFrequency.title.has(word)) {
-            user.termFrequency.title.set(word, 0);
+        post.tags.forEach((tag) => {
+          if (!user.likedTags.has(tag)) {
+            user.likedTags.set(tag, 0);
           }
-          user.termFrequency.title.set(word, user.termFrequency.title.get(word) + 1);
-          user.termFrequency.titleCount += 1;
+          user.likedTags.set(tag, user.likedTags.get(tag) + 1);
         });
 
-        if (post.type != null) {
-          const typeWords = post.title.split(' ');
-          typeWords.forEach((word) => {
-            if (!user.termFrequency.type.has(word)) {
-              user.termFrequency.type.set(word, 0);
-            }
-            user.termFrequency.type.set(word, user.termFrequency.type.get(word) + 1);
-            user.termFrequency.typeCount += 1;
-          });
-        }
-
-        if (post.recipe != null) {
-          post.recipe.ingredients.forEach((ingredient) => {
-            if (!user.termFrequency.ingredients.has(ingredient.ingredientName)) {
-              user.termFrequency.ingredients.set(ingredient.ingredientName, 0);
-            }
-            user.termFrequency.ingredients.set(ingredient.ingredientName, 
-              user.termFrequency.ingredients.get(ingredient.ingredientName) + 1);
-            user.termFrequency.ingredientsCount += 1;
-          });
-        }
-        
-        const difficulties = ['easy', 'medium', 'hard'];
-        if (!user.termFrequency.difficulty.has(difficulties[post.difficulty - 1])) {
-          user.termFrequency.difficulty.set(difficulties[post.difficulty - 1], 0);
-        }
-        user.termFrequency.difficulty.set(difficulties[post.difficulty - 1], user.termFrequency.difficulty.get(difficulties[post.difficulty - 1]) + 1);
-        user.termFrequency.difficultyCount += 1;
-        console.log(user);
         user.save();
       }
+    } else if (query.update_type === 'dislike') {
+      const user = await User.findById(query.user);
+      post.tags.forEach((tag) => {
+        if (!user.likedTags.has(tag)) {
+          user.likedTags.set(tag, 0);
+        }
+        user.likedTags.set(tag, user.likedTags.get(tag) - 1);
+      });
+
+      user.save();
     }
-    
+
     // return *updated* post
     return post;
   } catch (error) {
