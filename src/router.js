@@ -111,7 +111,7 @@ router.route('/users/:id/collections')
 router.post('/signin', requireSignin, async (req, res) => {
   try {
     const token = Users.signin(req.user);
-    res.json({ token, email: req.user.email });
+    res.json({ token, email: req.user.email, username: req.user.username });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
   }
