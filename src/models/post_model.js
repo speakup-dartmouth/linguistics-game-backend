@@ -21,10 +21,10 @@ const CommentSchema = new Schema({
   content: { type: String, required: true },
   post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  createdAt: { type: Date, default: Date.now }
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
-  timestamps: true,
 });
 
 const PostSchema = new Schema({
@@ -46,7 +46,7 @@ const PostSchema = new Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   likeCount: Number,
   parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
-  children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+  children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },

@@ -37,12 +37,12 @@ export async function createPost(postFields) {
 }
 export async function getPosts(query) {
   if ('search_term' in query) {
-    const posts = await Post.find({ $text: { $search: query.search_term } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+    const posts = await Post.find({ $text: { $search: query.search_term } }).lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
     return posts;
   }
 
   if ('user' in query) {
-    const user = await User.findById(query.user);
+    const user = await User.findById(query.user).lean();
     if (!user) {
       throw new Error('user not found');
     }
@@ -50,11 +50,11 @@ export async function getPosts(query) {
     if ('home' in query) {
       // get all posts from following
       if (query.home === 'all') {
-        const posts = await Post.find({ author: { $in: user.following } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        const posts = await Post.find({ author: { $in: user.following } }).lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
         return posts;
       // get only unviewed posts
       } else if (query.home === 'unviewed') {
-        const posts = await Post.find({ author: { $in: user.following }, _id: { $nin: user.viewedPosts } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        const posts = await Post.find({ author: { $in: user.following }, _id: { $nin: user.viewedPosts } }).lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
         return posts;
       } else {
         throw new Error('please provide a valid home query value');
@@ -72,7 +72,7 @@ export async function getPosts(query) {
           promises.push(new Promise((resolve, reject) => {
             try {
               const func = async () => {
-                const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user.id, $nin: user.following }, _id: { $nin: user.viewedPosts } }).sort({ likeCount: -1 });
+                const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user.id, $nin: user.following }, _id: { $nin: user.viewedPosts } }).lean().sort({ likeCount: -1 });
                 return { tag: sortedTags[i][0], posts };
               };
               const result = func();
@@ -106,18 +106,18 @@ export async function getPosts(query) {
       }
     // get user's posts
     } else {
-      const posts = await Post.find({ author: { $in: user.id } }).populate('author', 'username profilePicture').sort({ createdAt: -1 });
+      const posts = await Post.find({ author: { $in: user.id } }).lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
       return posts;
     }
   }
 
   // return all posts
-  const posts = await Post.find().populate('author', 'username profilePicture');
+  const posts = await Post.find().lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
   return posts;
 }
 export async function getPost(id) {
   // await finding one post
-  const post = await Post.findById(id).populate('author', 'username profilePicture');
+  const post = await Post.findById(id).lean().populate('author', 'username profilePicture');
   // return post
   if (!post) {
     throw new Error('post not found');
@@ -132,9 +132,9 @@ export async function deletePost(id) {
 }
 export async function updatePost(id, query, postFields) {
   try {
+    // await updating a post by id
     const post = await Post.findByIdAndUpdate(id, postFields, { returnDocument: 'after' });
 
-    // await updating a post by id
     if ('update_type' in query) {
       if (query.update_type === 'like') {
         const user = await User.findById(query.user);
