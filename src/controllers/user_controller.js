@@ -18,7 +18,7 @@ export async function getUsers(query) {
     const posts = await User.find({ username: { $regex: query.search_term, $options: 'i' } });
     return posts;
   }
-  
+
   const users = await User.find();
   return users;
 }

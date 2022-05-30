@@ -20,10 +20,17 @@ export async function createPost(postFields) {
   post.tags = postFields.tags;
   post.author = postFields.author;
   post.likeCount = 0;
+  post.parent = postFields.parent;
+
   // return post
   try {
-    const savedpost = await post.save();
-    return savedpost;
+    const savedPost = await post.save();
+    if (savedPost.parent != null) {
+      const parent = savedPost.parent;
+      await Post.findByIdAndUpdate(savedPost.parent, {$addToSet: {children: savedPost.id}});
+    } 
+
+    return savedPost;
   } catch (error) {
     throw new Error(`create post error: ${error}`);
   }

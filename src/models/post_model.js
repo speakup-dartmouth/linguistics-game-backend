@@ -45,6 +45,8 @@ const PostSchema = new Schema({
   comments: [CommentSchema],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   likeCount: Number,
+  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+  children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
