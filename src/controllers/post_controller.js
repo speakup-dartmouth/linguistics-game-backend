@@ -108,7 +108,7 @@ export async function getPosts(query) {
             });
           });
         } catch (error) {
-          reject(error);
+          throw new Error(`failed to fetch posts, error: ${error}`);
         }
 
         return recommended;
