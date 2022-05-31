@@ -110,8 +110,8 @@ router.route('/users/:id/collections')
 
 router.post('/signin', requireSignin, async (req, res) => {
   try {
-    const token = Users.signin(req.user);
-    res.json({ token, email: req.user.email, username: req.user.username });
+    const result = Users.signin(req.user);
+    res.json({ token: result.token, id: result.id, email: req.user.email, username: req.user.username });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
   }
@@ -119,8 +119,8 @@ router.post('/signin', requireSignin, async (req, res) => {
 
 router.post('/signup', async (req, res) => {
   try {
-    const token = await Users.signup(req.body);
-    res.json({ token, email: req.body.email });
+    const result = await Users.signup(req.body);
+    res.json({ token: result.token, id: result.id, email: req.body.email, username: req.body.username});
   } catch (error) {
     res.status(422).send({ error: error.toString() });
   }

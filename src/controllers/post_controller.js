@@ -14,7 +14,7 @@ export async function createPost(postFields) {
   post.images = postFields.images;
   post.video = postFields.video;
   post.recipeUrl = postFields.recipeUrl;
-  post.likes = postFields.likes;
+  post.likes = [];
   post.comments = postFields.comments;
   post.tags = postFields.tags;
   post.author = postFields.author;

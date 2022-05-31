@@ -1,6 +1,7 @@
 import jwt from 'jwt-simple';
 import dotenv from 'dotenv';
 import User from '../models/user_model';
+import bcrypt from 'bcryptjs/dist/bcrypt';
 
 dotenv.config({ silent: true });
 
@@ -24,8 +25,19 @@ export async function getUsers(query) {
 }
 
 export async function updateUser(id, userFields) {
+  // hash password if it's being updated
   try {
-    const user = await User.findByIdAndUpdate(id, userFields, { returnDocument: 'after' });
+    if (userFields.password != null) {
+      try {
+        // salt, hash, then set password to hash
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(userFields.password, salt);
+        userFields.password = hash;
+      } catch (error) {
+        throw new Error('error hashing password');
+      }
+    }
+    const user = await User.findOneAndUpdate(id, userFields, { returnDocument: 'after' });
     return user;
   } catch (error) {
     console.log(error);
@@ -86,7 +98,7 @@ export async function getCollections(id, query) {
 }
 
 export const signin = (user) => {
-  return tokenForUser(user);
+  return {token: tokenForUser(user), id: user.id};
 };
 
 // note the lovely destructuring here indicating that we are passing in an object with these 3 keys
@@ -108,7 +120,7 @@ export const signup = async ({ username, email, password }) => {
   user.password = password;
   user.likedTags = new Map();
   await user.save();
-  return tokenForUser(user);
+  return {token: tokenForUser(user), id: user.id};
 };
 
 // encodes a new token for a user object
