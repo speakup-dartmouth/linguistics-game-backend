@@ -19,7 +19,7 @@ export async function getUsers(query) {
     return posts;
   }
 
-  const users = await User.find();
+  const users = await User.find({}, '-email -bio -password -following -followers -collections -likedTags -viewedPosts');
   return users;
 }
 

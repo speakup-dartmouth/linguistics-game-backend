@@ -33,7 +33,6 @@ const PostSchema = new Schema({
     required: true,
   },
   description: String,
-  type: String,
   tags: [String],
   recipe: RecipeSchema,
   difficulty: Number,
