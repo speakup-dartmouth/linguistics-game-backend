@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
 router.route('/posts')
   .post(requireAuth, async (req, res) => {
     try {
-      const result = await Posts.createPost(req.body, req.user);
+      const result = await Posts.createPost(req.body, req.user, req.query);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
@@ -54,7 +54,7 @@ router.route('/posts/:postID')
   })
   .delete(async (req, res) => {
     try {
-      const result = await Posts.deletePost(req.params.postID);
+      const result = await Posts.deletePost(req.params.postID, req.query);
       res.json(result);
     } catch (error) {
       res.status(401).json({ error: error.toString() });
@@ -83,7 +83,7 @@ router.route('/users/:id')
   })
   .put(async (req, res) => {
     try {
-      const result = await Users.updateUser(req.params.id, req.body);
+      const result = await Users.updateUser(req.params.id, req.body, req.query);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
@@ -91,7 +91,7 @@ router.route('/users/:id')
   })
   .delete(async (req, res) => {
     try {
-      const result = await Users.deleteUser(req.params.id);
+      const result = await Users.deleteUser(req.params.id, req.query);
       res.json(result);
     } catch (error) {
       res.status(401).json({ error: error.toString() });

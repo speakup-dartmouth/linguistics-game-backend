@@ -1,7 +1,11 @@
 import Post from '../models/post_model';
 import User from '../models/user_model';
 
-export async function createPost(postFields) {
+export async function createPost(postFields, user, query) {
+  if (!('key' in query) || query.key !== process.env.API_KEY) {
+    throw new Error('Please provide a valid API Key');
+  }
+
   // await creating a post
   const post = new Post();
   post.title = postFields.title;
@@ -17,7 +21,7 @@ export async function createPost(postFields) {
   post.likes = [];
   post.comments = postFields.comments;
   post.tags = postFields.tags;
-  post.author = postFields.author;
+  post.author = user.id;
   post.likeCount = 0;
   post.parent = postFields.parent;
 
@@ -129,7 +133,10 @@ export async function getPost(id) {
   }
   return post;
 }
-export async function deletePost(id) {
+export async function deletePost(id, query) {
+  if (!('key' in query) || query.key !== process.env.API_KEY) {
+    throw new Error('Please provide a valid API Key');
+  }
   // await deleting a post
   await Post.findByIdAndDelete(id);
   // return confirmation

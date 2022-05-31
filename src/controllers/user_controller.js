@@ -6,6 +6,9 @@ import bcrypt from 'bcryptjs/dist/bcrypt';
 dotenv.config({ silent: true });
 
 export async function getUser(id, query) {
+  if (!('key' in query) || query.key !== process.env.API_KEY) {
+    throw new Error('Please provide a valid API Key');
+  }
   const user = await User.findById(id).lean();
   if (!user) {
     throw new Error('user not found');
@@ -24,7 +27,10 @@ export async function getUsers(query) {
   return users;
 }
 
-export async function updateUser(id, userFields) {
+export async function updateUser(id, userFields, query) {
+  if (!('key' in query) || query.key !== process.env.API_KEY) {
+    throw new Error('Please provide a valid API Key');
+  }
   // hash password if it's being updated
   try {
     if (userFields.password != null) {
@@ -45,12 +51,18 @@ export async function updateUser(id, userFields) {
   }
 }
 
-export async function deleteUser(id) {
+export async function deleteUser(id, query) {
+  if (!('key' in query) || query.key !== process.env.API_KEY) {
+    throw new Error('Please provide a valid API Key');
+  }
   await User.findByIdAndDelete(id);
   return { msg: `user ${id} deleted successfully.` };
 }
 
 export async function getCollections(id, query) {
+  if (!('key' in query) || query.key !== process.env.API_KEY) {
+    throw new Error('Please provide a valid API Key');
+  }
   if ('collection_type' in query) {
     const user = await User.findById(id).lean().populate({ path: 'collections.posts' });
     if (!user) {
