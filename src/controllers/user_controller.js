@@ -5,7 +5,7 @@ import User from '../models/user_model';
 dotenv.config({ silent: true });
 
 export async function getUser(id, query) {
-  const user = await User.findById(id);
+  const user = await User.findById(id).lean();
   if (!user) {
     throw new Error('user not found');
   }
@@ -15,11 +15,11 @@ export async function getUser(id, query) {
 export async function getUsers(query) {
   // return searched for users if search_term exists
   if ('search_term' in query) {
-    const posts = await User.find({ username: { $regex: query.search_term, $options: 'i' } });
+    const posts = await User.find({ username: { $regex: query.search_term, $options: 'i' } }).lean();
     return posts;
   }
 
-  const users = await User.find();
+  const users = await User.find({}, '-email -bio -password -following -followers -collections -likedTags -viewedPosts');
   return users;
 }
 
@@ -40,13 +40,12 @@ export async function deleteUser(id) {
 
 export async function getCollections(id, query) {
   if ('collection_type' in query) {
+    const user = await User.findById(id).lean().populate({ path: 'collections.posts' });
+    if (!user) {
+      throw new Error('user not found');
+    }
+
     if (query.collection_type === 'date') {
-      const user = await User.findById(id).populate({ path: 'collections.posts' });
-
-      if (!user) {
-        throw new Error('user not found');
-      }
-
       let savedPosts = [];
       user.collections.forEach((collection) => {
         savedPosts = savedPosts.concat(collection.posts);
@@ -56,12 +55,6 @@ export async function getCollections(id, query) {
       savedPosts.sort((a, b) => { return b.createdAt - a.createdAt; });
       return savedPosts;
     } else if (query.collection_type === 'difficulty') {
-      const user = await User.findById(id).populate({ path: 'collections.posts' });
-
-      if (!user) {
-        throw new Error('user not found');
-      }
-
       let savedPosts = [];
       user.collections.forEach((collection) => {
         savedPosts = savedPosts.concat(collection.posts);
@@ -71,27 +64,11 @@ export async function getCollections(id, query) {
       savedPosts.sort((a, b) => { return a.difficulty - b.difficulty; });
       return savedPosts;
     } else if (query.collection_type === 'collections') {
-      const user = await User.findById(id).populate({ path: 'collections.posts' });
-
-      if (!user) {
-        throw new Error('user not found');
-      }
-
       return user.collections;
     } else if (query.collection_type === 'search') {
       if (!('search_term' in query)) {
         throw new Error('Please enter a search_term');
       }
-      const user = await User.findById(id).populate({ path: 'collections.posts' });
-
-      if (!user) {
-        throw new Error('user not found');
-      }
-
-      let savedPosts = [];
-      user.collections.forEach((collection) => {
-        savedPosts = savedPosts.concat(collection.posts);
-      });
 
       // only include savedPosts that contain the search term
       savedPosts = savedPosts.filter((post) => {
