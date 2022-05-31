@@ -89,23 +89,27 @@ export async function getPosts(query) {
             }
           }));
         }
-
-        await Promise.all(promises).then((result) => {
-          let indices = [];
-          for (let i = 0; i < Math.min(7, sortedTags.length); i += 1) {
-            indices.push(i);
-          }
-          let lastIndex = indices.length;
-
-          result.map(({ tag, posts }) => {
-            let index = Math.floor(Math.random() * lastIndex);
-            [indices[lastIndex - 1], indices[index]] = [indices[index], indices[lastIndex - 1]];
-            lastIndex -= 1;
-            return (
-              recommended[indices[lastIndex]] = { tag, posts }
-            );
+        
+        try {
+          await Promise.all(promises).then((result) => {
+            let indices = [];
+            for (let i = 0; i < Math.min(7, sortedTags.length); i += 1) {
+              indices.push(i);
+            }
+            let lastIndex = indices.length;
+  
+            result.map(({ tag, posts }) => {
+              let index = Math.floor(Math.random() * lastIndex);
+              [indices[lastIndex - 1], indices[index]] = [indices[index], indices[lastIndex - 1]];
+              lastIndex -= 1;
+              return (
+                recommended[indices[lastIndex]] = { tag, posts }
+              );
+            });
           });
-        });
+        } catch (error) {
+          reject(error);
+        }
 
         return recommended;
       } else {
