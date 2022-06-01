@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
 router.route('/posts')
   .post(requireAuth, async (req, res) => {
     try {
-      const result = await Posts.createPost(req.body, req.user, req.query);
+      const result = await Posts.createPost(req.body, req.query);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
