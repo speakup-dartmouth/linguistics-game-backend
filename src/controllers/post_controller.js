@@ -56,7 +56,7 @@ export async function getPosts(query) {
         let posts = await Post.find({ author: { $in: user.following } }, '-recipe -comments -parent -children')
         .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
         if (posts.length == 0) {
-          posts = await Post.find({ author: { $ne: user._id } }, '-recipe -comments -parent -children').sort({ likeCount: -1 });
+          posts = await Post.find({ author: { $ne: user._id } }, '-recipe -comments -parent -children').lean().populate('author', 'username profilePicture').sort({ likeCount: -1 });
         }
         return posts;
       // get only unviewed posts
