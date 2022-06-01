@@ -40,7 +40,7 @@ export async function createPost(postFields, user, query) {
 export async function getPosts(query) {
   if ('search_term' in query) {
     const posts = await Post.find({ $text: { $search: query.search_term } }, '-recipe -comments -likes -parent -children')
-      .lean().populate('author', 'username profilePicture', 'children').sort({ createdAt: -1 });
+      .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
     return posts;
   }
 
@@ -129,7 +129,7 @@ export async function getPosts(query) {
 }
 export async function getPost(id) {
   // await finding one post
-  const post = await Post.findById(id).lean().populate('author', 'username profilePicture');
+  const post = await Post.findById(id).lean().populate('author', 'username profilePicture').populate('children', 'images');
   // return post
   if (!post) {
     throw new Error('post not found');
