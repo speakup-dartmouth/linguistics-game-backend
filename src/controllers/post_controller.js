@@ -40,7 +40,7 @@ export async function createPost(postFields, user, query) {
 export async function getPosts(query) {
   if ('search_term' in query) {
     const posts = await Post.find({ $text: { $search: query.search_term } }, '-recipe -comments -likes -parent -children')
-      .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
+      .lean().populate('author', 'username profilePicture', 'children').sort({ createdAt: -1 });
     return posts;
   }
 
