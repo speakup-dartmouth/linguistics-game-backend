@@ -53,8 +53,11 @@ export async function getPosts(query) {
     if ('home' in query) {
       // get all posts from following
       if (query.home === 'all') {
-        const posts = await Post.find({ author: { $in: user.following } }, '-recipe -comments -parent -children')
+        let posts = await Post.find({ author: { $in: user.following } }, '-recipe -comments -parent -children')
         .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
+        if (posts.length == 0) {
+          posts = await Post.find({ author: { $ne: user._id } }, '-recipe -comments -parent -children').sort({ likeCount: -1 });
+        }
         return posts;
       // get only unviewed posts
       } else if (query.home === 'unviewed') {
