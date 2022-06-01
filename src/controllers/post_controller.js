@@ -14,7 +14,6 @@ export async function createPost(postFields, user, query) {
   post.recipe = postFields.recipe;
   post.difficulty = postFields.difficulty;
   post.time = postFields.time;
-  post.featuredImage = postFields.featuredImage;
   post.images = postFields.images;
   post.video = postFields.video;
   post.recipeUrl = postFields.recipeUrl;
@@ -130,7 +129,7 @@ export async function getPosts(query) {
 }
 export async function getPost(id) {
   // await finding one post
-  const post = await Post.findById(id).lean().populate('author', 'username profilePicture');
+  const post = await Post.findById(id).lean().populate('author', 'username profilePicture').populate('children', 'images');
   // return post
   if (!post) {
     throw new Error('post not found');
