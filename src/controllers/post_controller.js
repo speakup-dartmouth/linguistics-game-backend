@@ -1,7 +1,7 @@
 import Post from '../models/post_model';
 import User from '../models/user_model';
 
-export async function createPost(postFields, query) {
+export async function createPost(postFields, query, user) {
   if (!('key' in query) || query.key !== process.env.API_KEY) {
     throw new Error('Please provide a valid API Key');
   }
@@ -20,7 +20,7 @@ export async function createPost(postFields, query) {
   post.likes = [];
   post.comments = [];
   post.tags = postFields.tags;
-  post.author = postFields.author;
+  post.author = user.id;
   post.likeCount = 0;
   post.parent = postFields.parent;
 
