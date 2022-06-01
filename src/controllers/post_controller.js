@@ -18,7 +18,7 @@ export async function createPost(postFields, query) {
   post.video = postFields.video;
   post.recipeUrl = postFields.recipeUrl;
   post.likes = [];
-  post.comments = postFields.comments;
+  post.comments = [];
   post.tags = postFields.tags;
   post.author = postFields.author;
   post.likeCount = 0;
@@ -39,7 +39,7 @@ export async function createPost(postFields, query) {
 }
 export async function getPosts(query) {
   if ('search_term' in query) {
-    const posts = await Post.find({ $text: { $search: query.search_term } }, '-recipe -comments -likes -parent -children')
+    const posts = await Post.find({ $text: { $search: query.search_term } }, '-recipe -comments -parent -children')
       .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
     return posts;
   }
@@ -53,12 +53,12 @@ export async function getPosts(query) {
     if ('home' in query) {
       // get all posts from following
       if (query.home === 'all') {
-        const posts = await Post.find({ author: { $in: user.following } }, '-recipe -comments -likes -parent -children')
+        const posts = await Post.find({ author: { $in: user.following } }, '-recipe -comments -parent -children')
         .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
         return posts;
       // get only unviewed posts
       } else if (query.home === 'unviewed') {
-        const posts = await Post.find({ author: { $in: user.following }, _id: { $nin: user.viewedPosts } }, '-recipe -comments -likes -parent -children')
+        const posts = await Post.find({ author: { $in: user.following }, _id: { $nin: user.viewedPosts } }, '-recipe -comments -parent -children')
           .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
         return posts;
       } else {
@@ -67,7 +67,7 @@ export async function getPosts(query) {
     } else if ('discovery' in query) {
       // return posts sorted by most liked that are not made by the user
       if (query.discovery === 'hot') {
-        const posts = await Post.find({ author: { $ne: user._id } }, '-recipe -comments -likes -parent -children').sort({ likeCount: -1 });
+        const posts = await Post.find({ author: { $ne: user._id } }, '-recipe -comments -parent -children').sort({ likeCount: -1 });
         return posts;
       } else if (query.discovery === 'recommended') {
         const sortedTags = [...user.likedTags.entries()].sort((a, b) => { return b[1] - a[1]; });
@@ -77,7 +77,7 @@ export async function getPosts(query) {
           promises.push(new Promise((resolve, reject) => {
             try {
               const func = async () => {
-                const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user._id, $nin: user.following }, _id: { $nin: user.viewedPosts } }, '-recipe -comments -likes -parent -children')
+                const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user._id, $nin: user.following }, _id: { $nin: user.viewedPosts } }, '-recipe -comments -parent -children')
                   .lean().sort({ likeCount: -1 });
                 return { tag: sortedTags[i][0], posts };
               };
@@ -116,14 +116,14 @@ export async function getPosts(query) {
       }
     // get user's posts
     } else {
-      const posts = await Post.find({ author: { $in: user._id } }, '-recipe -comments -likes -parent -children' )
+      const posts = await Post.find({ author: { $in: user._id } }, '-recipe -comments -parent -children' )
         .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
       return posts;
     }
   }
 
   // return all posts
-  const posts = await Post.find({}, '-recipe -comments -likes -parent -children')
+  const posts = await Post.find({}, '-recipe -comments -parent -children')
     .lean().populate('author', 'username profilePicture').sort({ createdAt: -1 });
   return posts;
 }
