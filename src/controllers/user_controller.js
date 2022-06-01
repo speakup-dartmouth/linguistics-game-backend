@@ -43,7 +43,7 @@ export async function updateUser(id, userFields, query) {
         throw new Error('error hashing password');
       }
     }
-    const user = await User.findbyIdAndUpdate(id, userFields, { returnDocument: 'after' });
+    const user = await User.findByIdAndUpdate(id, userFields, { returnDocument: 'after' });
     return user;
   } catch (error) {
     console.log(error);
