@@ -14,7 +14,6 @@ export async function createPost(postFields, user, query) {
   post.recipe = postFields.recipe;
   post.difficulty = postFields.difficulty;
   post.time = postFields.time;
-  post.featuredImage = postFields.featuredImage;
   post.images = postFields.images;
   post.video = postFields.video;
   post.recipeUrl = postFields.recipeUrl;

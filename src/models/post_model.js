@@ -37,7 +37,6 @@ const PostSchema = new Schema({
   recipe: RecipeSchema,
   difficulty: Number,
   time: Number,
-  featuredImage: String,
   images: [String],
   recipeURL: String,
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
