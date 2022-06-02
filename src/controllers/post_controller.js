@@ -132,7 +132,7 @@ export async function getPosts(query) {
 }
 export async function getPost(id) {
   // await finding one post
-  const post = await Post.findById(id).lean().populate('author', 'username profilePicture').populate('children', 'images');
+  const post = await Post.findById(id).lean().populate('author', 'username profilePicture').populate('children', 'images').populate({path: 'comments.author', select: 'username profilePicture' });
   // return post
   if (!post) {
     throw new Error('post not found');
