@@ -70,7 +70,7 @@ export async function getPosts(query) {
     } else if ('discovery' in query) {
       // return posts sorted by most liked that are not made by the user
       if (query.discovery === 'hot') {
-        const posts = await Post.find({ author: { $ne: user._id } }, '-recipe -comments -parent -children').sort({ likeCount: -1 });
+        const posts = await Post.find({ author: { $ne: user._id } }, '-recipe -comments -parent -children').lean().populate('author', 'username profilePicture').sort({ likeCount: -1 });
         return posts;
       } else if (query.discovery === 'recommended') {
         const sortedTags = [...user.likedTags.entries()].sort((a, b) => { return b[1] - a[1]; });
@@ -81,7 +81,7 @@ export async function getPosts(query) {
             try {
               const func = async () => {
                 const posts = await Post.find({ tags: sortedTags[i][0], author: { $ne: user._id, $nin: user.following }, _id: { $nin: user.viewedPosts } }, '-recipe -comments -parent -children')
-                  .lean().sort({ likeCount: -1 });
+                  .lean().populate('author', 'username profilePicture').sort({ likeCount: -1 });
                 return { tag: sortedTags[i][0], posts };
               };
               const result = func();
