@@ -5,19 +5,21 @@
 
 Hosted at [munch-api.onrender.com](https://munch-api.onrender.com)
 
-TODO: short project description, some sample screenshots or mockups
-
 ## Architecture
 
-TODO:  descriptions of code organization and tools and libraries used
+Express + Mongo backend
 
 ## Setup
 
-TODO: how to get the project dev environment up and running, npm install etc
+Add .env file with
+AUTH_SECRET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME, API_KEY
+npm install
+npm start
 
 ## Deployment
 
-TODO: how to deploy the project
+Deployed on Render with Mongo
+
 
 ## API Endpoints
 signin: POST http://munch-api.onrender.com/api/signin
