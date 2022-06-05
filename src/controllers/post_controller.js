@@ -31,6 +31,7 @@ export async function createPost(postFields, query, user) {
       const parent = savedPost.parent;
       await Post.findByIdAndUpdate(savedPost.parent, {$addToSet: {children: savedPost.id}});
     } 
+    await savedPost.populate('author', 'username profilePicture');
 
     return savedPost;
   } catch (error) {
