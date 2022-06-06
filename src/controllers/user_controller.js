@@ -65,7 +65,6 @@ export async function getCollections(id, query) {
   }
   if ('collection_type' in query) {
     const user = await User.findById(id).lean().populate({path: 'collections.posts', populate: { path: 'author', select: 'username profilePicture' }});
-    console.log(user.collections[0].posts);
     if (!user) {
       throw new Error('user not found');
     }
