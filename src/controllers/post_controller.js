@@ -152,7 +152,7 @@ export async function deletePost(id, query) {
 export async function updatePost(id, query, postFields) {
   try {
     // await updating a post by id
-    const post = await Post.findByIdAndUpdate(id, postFields, { returnDocument: 'after' });
+    const post = await Post.findByIdAndUpdate(id, postFields, { returnDocument: 'after' }).populate({path: 'comments.author', select: 'username profilePicture' });;
 
     if ('update_type' in query) {
       if (query.update_type === 'like') {
