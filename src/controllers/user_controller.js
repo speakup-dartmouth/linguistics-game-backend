@@ -64,7 +64,7 @@ export async function getCollections(id, query) {
     throw new Error('Please provide a valid API Key');
   }
   if ('collection_type' in query) {
-    const user = await User.findById(id).lean().populate({ path: 'collections.posts' });
+    const user = await User.findById(id).lean().populate({ path: 'collections.posts' }).populate({path: 'collections.posts.author', select: 'username profilePicture' });
     if (!user) {
       throw new Error('user not found');
     }
