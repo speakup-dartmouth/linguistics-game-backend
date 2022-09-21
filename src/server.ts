@@ -36,7 +36,7 @@ app.use('/resources', resourceRouter); // NOTE: Partially secured to users
 
 // default index route
 app.get('/', (req, res) => {
-  res.send('Welcome to backend!');
+  res.send('Welcome to the linguistics games backend!');
 });
 
 // DB Setup
