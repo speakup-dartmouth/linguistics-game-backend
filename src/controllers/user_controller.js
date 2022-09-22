@@ -23,7 +23,7 @@ export async function getUsers(query) {
     return posts;
   }
 
-  const users = await User.find({}, '-email -bio -password -following -followers -collections -likedTags -viewedPosts');
+  const users = await User.find({}, '-email -username -password');
   return users;
 }
 
@@ -59,56 +59,6 @@ export async function deleteUser(id, query) {
   return { msg: `user ${id} deleted successfully.` };
 }
 
-export async function getCollections(id, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
-  if ('collection_type' in query) {
-    const user = await User.findById(id).lean().populate({path: 'collections.posts', populate: { path: 'author', select: 'username profilePicture' }});
-    if (!user) {
-      throw new Error('user not found');
-    }
-
-    if (query.collection_type === 'date') {
-      let savedPosts = [];
-      user.collections.forEach((collection) => {
-        savedPosts = savedPosts.concat(collection.posts);
-      });
-
-      // sort by createdAt, most recent is at beginning of list
-      savedPosts.sort((a, b) => { return b.createdAt - a.createdAt; });
-      return savedPosts;
-    } else if (query.collection_type === 'difficulty') {
-      let savedPosts = [];
-      user.collections.forEach((collection) => {
-        savedPosts = savedPosts.concat(collection.posts);
-      });
-
-      // sort by difficulty, most easy is at beginning of list
-      savedPosts.sort((a, b) => { return a.difficulty - b.difficulty; });
-      return savedPosts;
-    } else if (query.collection_type === 'collections') {
-      return user.collections;
-    } else if (query.collection_type === 'search') {
-      if (!('search_term' in query)) {
-        throw new Error('Please enter a search_term');
-      }
-
-      // only include savedPosts that contain the search term
-      savedPosts = savedPosts.filter((post) => {
-        return (post.title != null && post.title.includes(query.search_term))
-        || (post.type != null && post.type.includes(query.search_term)) || (post.tags != null && post.tags.includes(query.search_term))
-        || (post.recipe != null && post.recipie.includes(query.search_term));
-      });
-      return savedPosts;
-    } else {
-      throw new Error('Please provide a valid collection_type query value');
-    }
-  } else {
-    throw new Error('Please provide a collection_type query');
-  }
-}
-
 export const signin = (user) => {
   return {token: tokenForUser(user), id: user.id};
 };
@@ -130,7 +80,6 @@ export const signup = async ({ username, email, password }) => {
   user.username = username;
   user.email = email;
   user.password = password;
-  user.likedTags = new Map();
   await user.save();
   return {token: tokenForUser(user), id: user.id};
 };

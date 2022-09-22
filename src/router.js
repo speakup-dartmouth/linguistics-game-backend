@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
-import * as Posts from './controllers/post_controller';
+import * as Posts from './controllers/question_controller';
 import * as Users from './controllers/user_controller';
 import { requireAuth, requireSignin } from './services/passport';
 import signS3 from './services/s3';
@@ -12,7 +12,7 @@ dotenv.config({ silent: true });
 const router = Router();
 
 router.get('/', (req, res) => {
-  res.json({ message: 'welcome to the munch api!' });
+  res.json({ message: 'welcome to the linguistics games api!' });
 });
 
 /// your routes will go here

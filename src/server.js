@@ -36,7 +36,7 @@ app.use('/api', apiRoutes);
 async function startServer() {
   try {
     // connect DB
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/munch_db';
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lgames_db';
     await mongoose.connect(mongoURI);
     console.log(`Mongoose connected to: ${mongoURI}`);
 

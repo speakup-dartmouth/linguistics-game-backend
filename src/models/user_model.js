@@ -1,28 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs/dist/bcrypt';
 
-const CollectionSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
-}, {
-  toObject: { virtuals: true },
-  toJSON: { virtuals: true },
-});
-
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
   username: { type: String, unique: true, lowercase: true },
   bio: String,
   password: String,
-  profilePicture: String,
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  viewedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
-  collections: [CollectionSchema],
-  likedTags: { type: Map, of: Number },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
