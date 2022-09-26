@@ -14,9 +14,10 @@ const QuestionSchema = new Schema({
   timestamps: true,
 });
 
-Question.index({
+const QuestionModel = mongoose.model('Question', QuestionSchema);
+
+QuestionSchema.index({
   title: 'text', type: 'text', tags: 'text', recipe: 'text',
 });
-const QuestionModel = mongoose.model('Question', QuestionSchema);
 
 export default QuestionModel;

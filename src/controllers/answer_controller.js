@@ -1,51 +1,50 @@
-import Question from '../models/question_model';
+import Answer from '../models/answer_model';
 
-export async function createQuestion(questionFields, query, user) {
+export async function createAnswer(answerFields, query, user) {
   if (!('key' in query) || query.key !== process.env.API_KEY) {
     throw new Error('Please provide a valid API Key');
   }
 
-  // await creating a question
-  const question = new Question();
-  question.title = questionFields.title;
-  question.description = questionFields.description;
-  question.options = questionFields.options;
+  // await creating a answer
+  const answer = new Answer();
+  answer.user = user;
+  answer.question = answerFields.question;
 
-  // return question
+  // return answer
   try {
-    const savedQuestion = await question.save();
-    return savedQuestion;
+    const savedAnswer = await answer.save();
+    return savedAnswer;
   } catch (error) {
-    throw new Error(`create question error: ${error}`);
+    throw new Error(`create answer error: ${error}`);
   }
 }
-export async function getQuestions(query) {
+export async function getAnswers(query) {
   if ('search_term' in query) {
-    const questions = await Question.find({ $text: { $search: query.search_term } }, '-title -options')
+    const answers = await Answer.find({ $text: { $search: query.search_term } }, '-title -options')
       .lean().sort({ createdAt: -1 });
-    return questions;
+    return answers;
   }
-  // return all questions
-  const questions = await Question.find({}, '-title -options')
+  // return all answers
+  const answers = await Answer.find({}, '-title -options')
     .lean().sort({ createdAt: -1 });
-  return questions;
+  return answers;
 }
 
-export async function getQuestion(id) {
-  // await finding one question
-  const question = await Question.findById(id).lean();
-  // return question
-  if (!question) {
-    throw new Error('question not found');
+export async function getAnswer(id) {
+  // await finding one answer
+  const answer = await Answer.findById(id).lean();
+  // return answer
+  if (!answer) {
+    throw new Error('answer not found');
   }
-  return question;
+  return answer;
 }
-export async function deleteQuestion(id, query) {
+export async function deleteAnswer(id, query) {
   if (!('key' in query) || query.key !== process.env.API_KEY) {
     throw new Error('Please provide a valid API Key');
   }
-  // await deleting a question
-  await Question.findByIdAndDelete(id);
+  // await deleting a answer
+  await Answer.findByIdAndDelete(id);
   // return confirmation
-  return { msg: `question ${id} deleted successfully.` };
+  return { msg: `answer ${id} deleted successfully.` };
 }
