@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
-import * as Posts from './controllers/question_controller';
+import * as Questions from './controllers/question_controller';
 import * as Users from './controllers/user_controller';
 import { requireAuth, requireSignin } from './services/passport';
 import signS3 from './services/s3';
 
 dotenv.config({ silent: true });
 
-// const { AUTH_SECRET } = process.env;
+const { AUTH_SECRET } = process.env;
 
 const router = Router();
 
@@ -17,10 +17,10 @@ router.get('/', (req, res) => {
 
 /// your routes will go here
 
-router.route('/posts')
-  .post(requireAuth, async (req, res) => {
+router.route('/questions')
+  .post(async (req, res) => {
     try {
-      const result = await Posts.createPost(req.body, req.query, req.user);
+      const result = await Questions.createQuestion(req.body, req.query, req.user);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
@@ -28,17 +28,17 @@ router.route('/posts')
   })
   .get(async (req, res) => {
     try {
-      const result = await Posts.getPosts(req.query);
+      const result = await Questions.getQuestions(req.query);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });
     }
   });
 
-router.route('/posts/:postID')
+router.route('/questions/:questionID')
   .get(async (req, res) => {
     try {
-      const result = await Posts.getPost(req.params.postID);
+      const result = await Questions.getQuestion(req.params.questionID);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });
@@ -46,7 +46,7 @@ router.route('/posts/:postID')
   })
   .put(async (req, res) => {
     try {
-      const result = await Posts.updatePost(req.params.postID, req.query, req.body);
+      const result = await Questions.updateQuestion(req.params.questionID, req.query, req.body);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
@@ -54,7 +54,7 @@ router.route('/posts/:postID')
   })
   .delete(async (req, res) => {
     try {
-      const result = await Posts.deletePost(req.params.postID, req.query);
+      const result = await Questions.deleteQuestion(req.params.questionID, req.query);
       res.json(result);
     } catch (error) {
       res.status(401).json({ error: error.toString() });

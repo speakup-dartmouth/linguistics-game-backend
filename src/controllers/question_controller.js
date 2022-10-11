@@ -1,10 +1,6 @@
 import Question from '../models/question_model';
 
 export async function createQuestion(questionFields, query, user) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
-
   // await creating a question
   const question = new Question();
   question.title = questionFields.title;
