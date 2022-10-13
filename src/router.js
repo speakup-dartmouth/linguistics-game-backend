@@ -130,6 +130,21 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+router.get('/user-info', requireAuth, async (req, res) => {
+  try {
+    if (req.user) {
+      const result = Users.signin(req.user);
+      res.json({
+        token: result.token, id: result.id, email: req.user.email, username: req.user.username,
+      });
+    } else {
+      res.status(401).send({ error: 'Unauthorized' });
+    }
+  } catch (error) {
+    res.status(422).send({ error: error.toString() });
+  }
+});
+
 router.get('/sign-s3', signS3);
 
 export default router;
