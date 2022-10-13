@@ -135,7 +135,7 @@ router.get('/user-info', requireAuth, async (req, res) => {
     if (req.user) {
       const result = Users.signin(req.user);
       res.json({
-        token: result.token, id: result.id, email: req.user.email, username: req.user.username,
+        id: result.id, email: req.user.email, username: req.user.username,
       });
     } else {
       res.status(401).send({ error: 'Unauthorized' });
