@@ -1,7 +1,7 @@
 import jwt from 'jwt-simple';
 import dotenv from 'dotenv';
-import User from '../models/user_model';
 import bcrypt from 'bcryptjs/dist/bcrypt';
+import User from '../models/user_model';
 
 dotenv.config({ silent: true });
 
@@ -60,12 +60,12 @@ export async function deleteUser(id, query) {
 }
 
 export const signin = (user) => {
-  return {token: tokenForUser(user), id: user.id};
+  return { token: tokenForUser(user), id: user.id };
 };
 
 // note the lovely destructuring here indicating that we are passing in an object with these 3 keys
 export const signup = async ({ username, email, password }) => {
-  if (!username ||!email || !password) {
+  if (!username || !email || !password) {
     throw new Error('You must provide username, email and password');
   }
 
@@ -81,7 +81,7 @@ export const signup = async ({ username, email, password }) => {
   user.email = email;
   user.password = password;
   await user.save();
-  return {token: tokenForUser(user), id: user.id};
+  return { token: tokenForUser(user), id: user.id };
 };
 
 // encodes a new token for a user object
