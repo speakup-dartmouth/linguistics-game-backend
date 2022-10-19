@@ -38,8 +38,8 @@ export async function getAnswer(id) {
 }
 
 export async function voteAnswer(id, query, fields) {
-    if(!query || !query.increment || query.increment < -1 || query.increment > 1) {
-      throw new Error('missing valid increment value as query string. usage: /answers/answerID/vote?increment={-1,0,1}');
+    if(!query || !query.v) {
+      throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
     }
     const { increment } = query;
     const answer = await Answer.findById(id).lean();
@@ -47,22 +47,32 @@ export async function voteAnswer(id, query, fields) {
       throw new Error('answer not found');
     }
     const { user } = fields;
+    const { v } = query;
 
     if(user == answer.user) {
       throw new Error('user cannot upvote own post');
     }
 
-    answer.upvotes = answer.upvotes.filter(item => !(item.equals(user)));
-    answer.downvotes = answer.downvotes.filter(item => !(item.equals(user)));
-
-    if(increment == 1) {
-      answer.upvotes.push(user);
+    if(v == 1) {
+      answer.downvotes = answer.downvotes.filter(item => !(item.equals(user)));
+      const filtered = answer.upvotes.filter(v => !v.equals(user));
+      if (filtered.length != answer.upvotes.length) {
+        answer.upvotes = filtered;
+      }
+      else {
+        answer.upvotes.push(user);
+      }
     }
-    else if(increment == -1) {
-      answer.downvotes.push(user);
+    else if(v == -1) {
+      answer.upvotes = answer.upvotes.filter(item => !(item.equals(user)));
+      const filtered = answer.downvotes.filter(v => !v.equals(user));
+      if (filtered.length != answer.downvotes.length) {
+        answer.downvotes = filtered;
+      }
+      else {
+        answer.downvotes.push(user);
+      }
     }
-
-    console.log(answer);
 
     // increment upvotes counter as simple integer
     // const answer = await Answer.findByIdAndUpdate(id, { $inc: {'upvotes': 1 } }, { returnDocument: 'after' });
