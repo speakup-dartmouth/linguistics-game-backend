@@ -6,6 +6,8 @@ export async function createAnswer(answerFields) {
   answer.user = answerFields.user;
   answer.question = answerFields.question;
   answer.recording = answerFields.recording;
+  answer.upvotes = 0;
+  answer.downvotes = 0;
 
   // return answer
   try {
@@ -16,13 +18,13 @@ export async function createAnswer(answerFields) {
   }
 }
 export async function getAnswers(query) {
-  if ('search_term' in query) {
-    const answers = await Answer.find({ $text: { $search: query.search_term } }, '-title -options')
+  if('u' in query) {
+    const answers = await Answer.find({ $or:[ { upvotes : { $in : [query['u']] }}, { downvotes : { $in : [query['u']] }}]})
       .lean().sort({ createdAt: -1 });
     return answers;
   }
   // return all answers
-  const answers = await Answer.find({}, '-title -options')
+  const answers = await Answer.find({})
     .lean().sort({ createdAt: -1 });
   return answers;
 }
@@ -41,7 +43,6 @@ export async function voteAnswer(id, query, fields) {
     if(!query || !query.v) {
       throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
     }
-    const { increment } = query;
     const answer = await Answer.findById(id).lean();
     if (!answer) {
       throw new Error('answer not found');
@@ -78,13 +79,6 @@ export async function voteAnswer(id, query, fields) {
     // const answer = await Answer.findByIdAndUpdate(id, { $inc: {'upvotes': 1 } }, { returnDocument: 'after' });
     const answer_result = await Answer.findByIdAndUpdate(id, answer, { returnDocument: 'after' });
     return answer_result;
-    // return answer
-  try {
-    const savedAnswer = await answer.save();
-    return savedAnswer;
-  } catch (error) {
-    throw new Error(`upvote answer error: ${error}`);
-  }
 }
 
 export async function deleteAnswer(id) {

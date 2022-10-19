@@ -93,6 +93,7 @@ export const signup = async ({ username, email, password, gender, birthday, inte
   user.gender = gender;
   user.birthday = birthday;
   user.interests = interests;
+  user.researchConsent = false;
   
   await user.save();
   return { token: tokenForUser(user), id: user.id };

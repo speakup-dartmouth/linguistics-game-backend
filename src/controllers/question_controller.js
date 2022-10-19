@@ -2,7 +2,7 @@ import Question from '../models/question_model';
 import Answer from '../models/answer_model';
 
 Array.prototype.unique = function() {
-  var a = this.concat();
+  let a = this.concat();
   for(var i=0; i<a.length; ++i) {
       for(var j=i+1; j<a.length; ++j) {
         if(a[i]["_id"].equals(a[j]["_id"])) {
@@ -12,7 +12,6 @@ Array.prototype.unique = function() {
         }
       }
   }
-
   return a;
 };
 

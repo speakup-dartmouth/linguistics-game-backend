@@ -1,9 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 
 const AnswerSchema = new Schema({
-  question: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' },
-  recording: String,
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  question: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true },
+  recording: { type: String, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 }, {
@@ -12,11 +12,12 @@ const AnswerSchema = new Schema({
   timestamps: true,
 });
 
-AnswerSchema.pre('save', async function beforeAnswerSave(next) {
-  const answer = this; // get access to the answer model
-  answer.upvotes = 0;
-  answer.downvotes = 0;
-  return next();
+AnswerSchema.virtual('upvoteCount').get(function () {
+  return this.upvotes.length;
+});
+
+AnswerSchema.virtual('downvoteCount').get(function () {
+  return this.downvotes.length;
 });
 
 const AnswerModel = mongoose.model('Answer', AnswerSchema);
