@@ -7,7 +7,7 @@ const UserSchema = new Schema({
   bio: String,
   password: String,
   gender: String,
-  age: Number,
+  birthday: Date,
   interests: [String],
   researchConsent: Boolean,
 }, {
