@@ -51,6 +51,16 @@ export async function updateUser(id, userFields, query) {
   }
 }
 
+export async function submitConsent(id) {
+  try {
+    const user = await User.findByIdAndUpdate(id, { researchConsent: true }, { returnDocument: 'after' });
+    return user;
+  } catch (error) {
+    console.log(error);
+    throw new Error(`update user error: ${error}`);
+  }
+}
+
 export async function deleteUser(id, query) {
   if (!('key' in query) || query.key !== process.env.API_KEY) {
     throw new Error('Please provide a valid API Key');

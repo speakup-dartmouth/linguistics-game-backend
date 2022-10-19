@@ -4,18 +4,17 @@ import * as Questions from './controllers/question_controller';
 import * as Users from './controllers/user_controller';
 import { requireAuth, requireSignin } from './services/passport';
 import signS3 from './services/s3';
+import * as Answers from './controllers/answer_controller';
 
 dotenv.config({ silent: true });
 
-const { AUTH_SECRET } = process.env;
+const { AUTH_SECRET, API_KEY } = process.env;
 
 const router = Router();
 
 router.get('/', (req, res) => {
   res.json({ message: 'welcome to the linguistics games api!' });
 });
-
-/// your routes will go here
 
 router.route('/questions')
   .post(async (req, res) => {
@@ -61,6 +60,60 @@ router.route('/questions/:questionID')
     }
   });
 
+  router.route('/answers')
+  .post(async (req, res) => {
+    try {
+      const result = await Answers.createAnswer(req.body);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.toString() });
+    }
+  })
+  .get(async (req, res) => {
+    try {
+      const result = await Answers.getAnswers(req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
+
+router.route('/answers/:answerID')
+  .get(async (req, res) => {
+    try {
+      const result = Answers.getAnswer(req.params.questionID);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  })
+  .put(async (req, res) => {
+    try {
+      const result = await Answers.updateAnswer(req.params.questionID, req.query, req.body);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.toString() });
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      const result = await Answers.deleteAnswer(req.params.questionID, req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(401).json({ error: error.toString() });
+    }
+  });
+
+  router.route('/answers/:answerID/vote')
+  .post(async (req, res) => {
+    try {
+      const result = await Answers.voteAnswer(req.params.answerID, req.query, req.body);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.toString() });
+    }
+  })
+
 router.route('/users')
   .get(async (req, res) => {
     try {
@@ -97,6 +150,16 @@ router.route('/users/:id')
       res.status(401).json({ error: error.toString() });
     }
   });
+
+  router.route('/users/:id/consent')
+    .post(async (req, res) => {
+      try {
+        const result = await Users.submitConsent(req.params.id);
+        res.json(result);
+      } catch (error) {
+        res.status(404).json({ error: error.toString() });
+      }
+    });
 
 router.route('/users/:id/collections')
   .get(async (req, res) => {

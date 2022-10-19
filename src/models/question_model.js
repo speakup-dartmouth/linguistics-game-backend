@@ -7,7 +7,7 @@ const QuestionSchema = new Schema({
   },
   description: String,
   options: [String],
-  answers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  areas: [String],
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
@@ -17,7 +17,7 @@ const QuestionSchema = new Schema({
 const QuestionModel = mongoose.model('Question', QuestionSchema);
 
 QuestionSchema.index({
-  title: 'text', type: 'text', tags: 'text', recipe: 'text',
+  title: 'text', areas: 'text', options: 'text', answers: 'text',
 });
 
 export default QuestionModel;

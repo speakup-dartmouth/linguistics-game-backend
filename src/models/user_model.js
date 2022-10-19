@@ -6,6 +6,10 @@ const UserSchema = new Schema({
   username: { type: String, unique: true, lowercase: true },
   bio: String,
   password: String,
+  gender: String,
+  age: Number,
+  interests: [String],
+  researchConsent: Boolean,
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
@@ -19,6 +23,8 @@ UserSchema.index({
 UserSchema.pre('save', async function beforeUserSave(next) {
   // get access to the user model
   const user = this;
+
+  user.researchConsent = false;
 
   if (!user.isModified('password')) return next();
 
