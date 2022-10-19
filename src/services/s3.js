@@ -1,25 +1,33 @@
 import aws from 'aws-sdk';
 
-const signS3 = (req, res) => {
-  const s3 = new aws.S3();
-  const fileName = req.query['file-name'];
-  const fileType = req.query['file-type'];
+const S3 = new aws.S3();
+
+const signS3 = async (req, res) => {
+  const fileName = req.query.filename;
+  const fileType = req.query.type;
+
+  if (!fileName || !fileType) {
+    return res.status(400).send({
+      error: 'Missing filename or filetype',
+    });
+  }
+
   const s3Params = {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileName,
-    Expires: 60,
     ContentType: fileType,
     ACL: 'public-read',
   };
-  s3.getSignedUrl('putObject', s3Params, (err, data) => {
-    if (err) { res.status(422).end(); }
-
-    const returnData = {
-      signedRequest: data,
-      url: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`,
-    };
-    return (res.send(JSON.stringify(returnData)));
-  });
+  try {
+    const url = await S3.getSignedUrlPromise('putObject', s3Params);
+    return res.status(200).send({
+      url,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      error,
+    });
+  }
 };
 
 export default signS3;

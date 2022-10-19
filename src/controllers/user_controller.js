@@ -1,7 +1,7 @@
 import jwt from 'jwt-simple';
 import dotenv from 'dotenv';
-import User from '../models/user_model';
 import bcrypt from 'bcryptjs/dist/bcrypt';
+import User from '../models/user_model';
 
 dotenv.config({ silent: true });
 
@@ -70,7 +70,7 @@ export async function deleteUser(id, query) {
 }
 
 export const signin = (user) => {
-  return {token: tokenForUser(user), id: user.id};
+  return { token: tokenForUser(user), id: user.id };
 };
 
 // note the lovely destructuring here indicating that we are passing in an object with these keys
@@ -95,7 +95,7 @@ export const signup = async ({ username, email, password, gender, birthday, inte
   user.interests = interests;
   
   await user.save();
-  return {token: tokenForUser(user), id: user.id};
+  return { token: tokenForUser(user), id: user.id };
 };
 
 // encodes a new token for a user object

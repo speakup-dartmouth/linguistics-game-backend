@@ -174,7 +174,9 @@ router.route('/users/:id/collections')
 router.post('/signin', requireSignin, async (req, res) => {
   try {
     const result = Users.signin(req.user);
-    res.json({ token: result.token, id: result.id, email: req.user.email, username: req.user.username });
+    res.json({
+      token: result.token, id: result.id, email: req.user.email, username: req.user.username,
+    });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
   }
@@ -183,7 +185,24 @@ router.post('/signin', requireSignin, async (req, res) => {
 router.post('/signup', async (req, res) => {
   try {
     const result = await Users.signup(req.body);
-    res.json({ token: result.token, id: result.id, email: req.body.email, username: req.body.username});
+    res.json({
+      token: result.token, id: result.id, email: req.body.email, username: req.body.username,
+    });
+  } catch (error) {
+    res.status(422).send({ error: error.toString() });
+  }
+});
+
+router.get('/user-info', requireAuth, async (req, res) => {
+  try {
+    if (req.user) {
+      const result = Users.signin(req.user);
+      res.json({
+        id: result.id, email: req.user.email, username: req.user.username,
+      });
+    } else {
+      res.status(401).send({ error: 'Unauthorized' });
+    }
   } catch (error) {
     res.status(422).send({ error: error.toString() });
   }
