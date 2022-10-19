@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const AnswerSchema = new Schema({
   question: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true },
-  recording: { type: String, required: true },
+  recordingURL: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

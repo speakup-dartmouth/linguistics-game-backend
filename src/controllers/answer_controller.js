@@ -5,7 +5,7 @@ export async function createAnswer(answerFields) {
   const answer = new Answer();
   answer.user = answerFields.user;
   answer.question = answerFields.question;
-  answer.recording = answerFields.recording;
+  answer.recordingURL = answerFields.recordingURL;
   answer.upvotes = 0;
   answer.downvotes = 0;
 
