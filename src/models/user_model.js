@@ -2,13 +2,17 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs/dist/bcrypt';
 
 const UserSchema = new Schema({
-  email: { type: String, unique: true, lowercase: true, required: true },
-  username: { type: String, unique: true, lowercase: true, required: true },
+  email: {
+    type: String, unique: true, lowercase: true, required: true,
+  },
+  username: {
+    type: String, unique: true, lowercase: true, required: true,
+  },
   bio: String,
   password: { type: String, required: true },
   gender: {
     type: String,
-    enum : ['male', 'female', 'nonbinary', 'other']
+    enum: ['male', 'female', 'nonbinary', 'other'],
   },
   birthday: Date,
   interests: [String],
