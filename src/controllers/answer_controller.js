@@ -1,4 +1,5 @@
 import Answer from '../models/answer_model';
+import * as Users from './user_controller';
 
 export async function createAnswer(answerFields) {
   // await creating a answer
@@ -40,6 +41,8 @@ export async function getAnswer(id) {
 }
 
 export async function voteAnswer(id, query, fields) {
+  console.log('voting');
+  console.log(id);
   if (!query || !query.v) {
     throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
   }
@@ -49,32 +52,52 @@ export async function voteAnswer(id, query, fields) {
   }
   const { user } = fields;
   const { v } = query;
+  console.log(`vote: ${v}`);
+  const vote = parseInt(v, 10);
+  console.log(`vote: ${vote}`);
 
-  if (user === answer.user) {
+  console.log(answer);
+
+  console.log(`answer user: ${answer.user}`);
+  console.log(`user: ${user}`);
+
+  if (answer.user.equals(user)) {
     throw new Error('user cannot upvote own post');
   }
 
-  if (v === 1) {
+  let score = 0;
+
+  if (vote === 1) {
     answer.downvotes = answer.downvotes.filter((item) => { return !(item.equals(user)); });
     const filtered = answer.upvotes.filter((a) => { return !a.equals(user); });
     if (filtered.length !== answer.upvotes.length) {
       answer.upvotes = filtered;
+      score = -1;
     } else {
       answer.upvotes.push(user);
+      score = 1;
     }
-  } else if (v === -1) {
+  } else if (vote === -1) {
     answer.upvotes = answer.upvotes.filter((item) => { return !(item.equals(user)); });
     const filtered = answer.downvotes.filter((a) => { return !a.equals(user); });
     if (filtered.length !== answer.downvotes.length) {
       answer.downvotes = filtered;
+      score = 1;
     } else {
       answer.downvotes.push(user);
+      score = -1;
     }
   }
 
-  // increment upvotes counter as simple integer
-  // const answer = await Answer.findByIdAndUpdate(id, { $inc: {'upvotes': 1 } }, { returnDocument: 'after' });
   const answerResult = await Answer.findByIdAndUpdate(id, answer, { returnDocument: 'after' });
+
+  // increment upvotes counter as simple integer
+  const scoreStatus = await Users.updateScore(answer.user, score);
+  if (!scoreStatus || !scoreStatus.msg) {
+    throw new Error('error updating score');
+  }
+  console.log(`score status: ${scoreStatus.msg}`);
+
   return answerResult;
 }
 

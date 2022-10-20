@@ -16,6 +16,7 @@ const UserSchema = new Schema({
   },
   birthday: Date,
   interests: [String],
+  score: Number,
   researchConsent: Boolean,
 }, {
   toObject: { virtuals: true },

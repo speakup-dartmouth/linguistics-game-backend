@@ -8,8 +8,6 @@ import * as Answers from './controllers/answer_controller';
 
 dotenv.config({ silent: true });
 
-const { AUTH_SECRET, API_KEY } = process.env;
-
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -60,7 +58,7 @@ router.route('/questions/:questionID')
     }
   });
 
-  router.route('/answers')
+router.route('/answers')
   .post(async (req, res) => {
     try {
       const result = await Answers.createAnswer(req.body);
@@ -104,7 +102,7 @@ router.route('/answers/:answerID')
     }
   });
 
-  router.route('/answers/:answerID/vote')
+router.route('/answers/:answerID/vote')
   .post(async (req, res) => {
     try {
       const result = await Answers.voteAnswer(req.params.answerID, req.query, req.body);
@@ -112,12 +110,22 @@ router.route('/answers/:answerID')
     } catch (error) {
       res.status(500).json({ error: error.toString() });
     }
-  })
+  });
 
 router.route('/users')
   .get(async (req, res) => {
     try {
       const result = await Users.getUsers(req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
+
+router.route('/leaderboard')
+  .get(async (req, res) => {
+    try {
+      const result = await Users.getTopUsers();
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });
@@ -151,15 +159,15 @@ router.route('/users/:id')
     }
   });
 
-  router.route('/users/:id/consent')
-    .post(async (req, res) => {
-      try {
-        const result = await Users.submitConsent(req.params.id);
-        res.json(result);
-      } catch (error) {
-        res.status(404).json({ error: error.toString() });
-      }
-    });
+router.route('/users/:id/consent')
+  .post(async (req, res) => {
+    try {
+      const result = await Users.submitConsent(req.params.id);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
 
 router.route('/users/:id/collections')
   .get(async (req, res) => {
