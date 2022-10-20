@@ -5,6 +5,7 @@ import * as Users from './controllers/user_controller';
 import { requireAuth, requireSignin } from './services/passport';
 import signS3 from './services/s3';
 import * as Answers from './controllers/answer_controller';
+import * as Info from './controllers/info_controller';
 
 dotenv.config({ silent: true });
 
@@ -12,6 +13,11 @@ const router = Router();
 
 router.get('/', (req, res) => {
   res.json({ message: 'welcome to the linguistics games api!' });
+});
+
+router.get('/categories', (req, res) => {
+  const result = Info.getCategories();
+  res.json(result);
 });
 
 router.route('/questions')
