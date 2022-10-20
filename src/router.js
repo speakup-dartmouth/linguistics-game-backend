@@ -60,7 +60,7 @@ router.route('/questions/:questionID')
     }
   });
 
-  router.route('/answers')
+router.route('/answers')
   .post(async (req, res) => {
     try {
       const result = await Answers.createAnswer(req.body);
@@ -104,7 +104,7 @@ router.route('/answers/:answerID')
     }
   });
 
-  router.route('/answers/:answerID/vote')
+router.route('/answers/:answerID/vote')
   .post(async (req, res) => {
     try {
       const result = await Answers.voteAnswer(req.params.answerID, req.query, req.body);
@@ -112,7 +112,7 @@ router.route('/answers/:answerID')
     } catch (error) {
       res.status(500).json({ error: error.toString() });
     }
-  })
+  });
 
 router.route('/users')
   .get(async (req, res) => {
@@ -151,15 +151,15 @@ router.route('/users/:id')
     }
   });
 
-  router.route('/users/:id/consent')
-    .post(async (req, res) => {
-      try {
-        const result = await Users.submitConsent(req.params.id);
-        res.json(result);
-      } catch (error) {
-        res.status(404).json({ error: error.toString() });
-      }
-    });
+router.route('/users/:id/consent')
+  .post(async (req, res) => {
+    try {
+      const result = await Users.submitConsent(req.params.id);
+      res.json(result.toJSON());
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
 
 router.route('/users/:id/collections')
   .get(async (req, res) => {
@@ -175,7 +175,10 @@ router.post('/signin', requireSignin, async (req, res) => {
   try {
     const result = Users.signin(req.user);
     res.json({
-      token: result.token, id: result.id, email: req.user.email, username: req.user.username,
+      token: result.token,
+      id: result.id,
+      email: req.user.email,
+      username: req.user.username,
     });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
@@ -186,7 +189,10 @@ router.post('/signup', async (req, res) => {
   try {
     const result = await Users.signup(req.body);
     res.json({
-      token: result.token, id: result.id, email: req.body.email, username: req.body.username,
+      token: result.token,
+      id: result.id,
+      email: req.body.email,
+      username: req.body.username,
     });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
@@ -196,10 +202,8 @@ router.post('/signup', async (req, res) => {
 router.get('/user-info', requireAuth, async (req, res) => {
   try {
     if (req.user) {
-      const result = Users.signin(req.user);
-      res.json({
-        id: result.id, email: req.user.email, username: req.user.username,
-      });
+      Users.signin(req.user);
+      res.json({ ...req.user.toJSON(), token: req.token });
     } else {
       res.status(401).send({ error: 'Unauthorized' });
     }

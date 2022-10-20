@@ -2,17 +2,21 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs/dist/bcrypt';
 
 const UserSchema = new Schema({
-  email: { type: String, unique: true, lowercase: true, required: true },
-  username: { type: String, unique: true, lowercase: true, required: true },
+  email: {
+    type: String, unique: true, lowercase: true, required: true,
+  },
+  username: {
+    type: String, unique: true, lowercase: true, required: true,
+  },
   bio: String,
   password: { type: String, required: true },
   gender: {
     type: String,
-    enum : ['male', 'female', 'nonbinary', 'other']
+    enum: ['male', 'female', 'nonbinary', 'other'],
   },
   birthday: Date,
   interests: [String],
-  researchConsent: Boolean,
+  researchConsent: { type: Boolean, default: false },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
@@ -45,6 +49,14 @@ UserSchema.methods.comparePassword = async function comparePassword(candidatePas
   const comparison = await bcrypt.compare(candidatePassword, this.password);
   return comparison;
 };
+
+UserSchema.method('toJSON', function toJSON() {
+  const {
+    // eslint-disable-next-line no-unused-vars
+    __v, password, ...object
+  } = this.toObject();
+  return object;
+});
 
 const UserModel = mongoose.model('User', UserSchema);
 
