@@ -18,8 +18,8 @@ export async function createAnswer(answerFields) {
   }
 }
 export async function getAnswers(query) {
-  if('u' in query) {
-    const answers = await Answer.find({ $or:[ { upvotes : { $in : [query['u']] }}, { downvotes : { $in : [query['u']] }}]})
+  if ('u' in query) {
+    const answers = await Answer.find({ $or: [{ upvotes: { $in: [query.u] } }, { downvotes: { $in: [query.u] } }] })
       .lean().sort({ createdAt: -1 });
     return answers;
   }
@@ -40,45 +40,42 @@ export async function getAnswer(id) {
 }
 
 export async function voteAnswer(id, query, fields) {
-    if(!query || !query.v) {
-      throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
-    }
-    const answer = await Answer.findById(id).lean();
-    if (!answer) {
-      throw new Error('answer not found');
-    }
-    const { user } = fields;
-    const { v } = query;
+  if (!query || !query.v) {
+    throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
+  }
+  const answer = await Answer.findById(id).lean();
+  if (!answer) {
+    throw new Error('answer not found');
+  }
+  const { user } = fields;
+  const { v } = query;
 
-    if(user == answer.user) {
-      throw new Error('user cannot upvote own post');
-    }
+  if (user === answer.user) {
+    throw new Error('user cannot upvote own post');
+  }
 
-    if(v == 1) {
-      answer.downvotes = answer.downvotes.filter(item => !(item.equals(user)));
-      const filtered = answer.upvotes.filter(v => !v.equals(user));
-      if (filtered.length != answer.upvotes.length) {
-        answer.upvotes = filtered;
-      }
-      else {
-        answer.upvotes.push(user);
-      }
+  if (v === 1) {
+    answer.downvotes = answer.downvotes.filter((item) => { return !(item.equals(user)); });
+    const filtered = answer.upvotes.filter((a) => { return !a.equals(user); });
+    if (filtered.length !== answer.upvotes.length) {
+      answer.upvotes = filtered;
+    } else {
+      answer.upvotes.push(user);
     }
-    else if(v == -1) {
-      answer.upvotes = answer.upvotes.filter(item => !(item.equals(user)));
-      const filtered = answer.downvotes.filter(v => !v.equals(user));
-      if (filtered.length != answer.downvotes.length) {
-        answer.downvotes = filtered;
-      }
-      else {
-        answer.downvotes.push(user);
-      }
+  } else if (v === -1) {
+    answer.upvotes = answer.upvotes.filter((item) => { return !(item.equals(user)); });
+    const filtered = answer.downvotes.filter((a) => { return !a.equals(user); });
+    if (filtered.length !== answer.downvotes.length) {
+      answer.downvotes = filtered;
+    } else {
+      answer.downvotes.push(user);
     }
+  }
 
-    // increment upvotes counter as simple integer
-    // const answer = await Answer.findByIdAndUpdate(id, { $inc: {'upvotes': 1 } }, { returnDocument: 'after' });
-    const answer_result = await Answer.findByIdAndUpdate(id, answer, { returnDocument: 'after' });
-    return answer_result;
+  // increment upvotes counter as simple integer
+  // const answer = await Answer.findByIdAndUpdate(id, { $inc: {'upvotes': 1 } }, { returnDocument: 'after' });
+  const answerResult = await Answer.findByIdAndUpdate(id, answer, { returnDocument: 'after' });
+  return answerResult;
 }
 
 export async function deleteAnswer(id) {
