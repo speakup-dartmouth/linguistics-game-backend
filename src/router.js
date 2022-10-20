@@ -151,10 +151,10 @@ router.route('/users/:id')
     }
   });
 
-router.route('/users/:id/consent')
-  .post(async (req, res) => {
+router.route('/update-consent')
+  .post(requireAuth, async (req, res) => {
     try {
-      const result = await Users.submitConsent(req.params.id);
+      const result = await Users.submitConsent(req.user.id, req.body.researchConsent);
       res.json(result.toJSON());
     } catch (error) {
       res.status(404).json({ error: error.toString() });
@@ -202,8 +202,8 @@ router.post('/signup', async (req, res) => {
 router.get('/user-info', requireAuth, async (req, res) => {
   try {
     if (req.user) {
-      Users.signin(req.user);
-      res.json({ ...req.user.toJSON(), token: req.token });
+      const { token } = Users.signin(req.user);
+      res.json({ ...req.user.toJSON(), token });
     } else {
       res.status(401).send({ error: 'Unauthorized' });
     }

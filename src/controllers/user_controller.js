@@ -51,9 +51,9 @@ export async function updateUser(id, userFields, query) {
   }
 }
 
-export async function submitConsent(id) {
+export async function submitConsent(id, consent = true) {
   try {
-    const user = await User.findByIdAndUpdate(id, { researchConsent: true }, { returnDocument: 'after' });
+    const user = await User.findByIdAndUpdate(id, { researchConsent: consent }, { returnDocument: 'after' });
     return user;
   } catch (error) {
     console.log(error);
