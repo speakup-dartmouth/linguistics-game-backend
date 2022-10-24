@@ -2,6 +2,7 @@ import jwt from 'jwt-simple';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs/dist/bcrypt';
 import User from '../models/user_model';
+import { validateEmail } from '../common/auth_utils';
 
 dotenv.config({ silent: true });
 
@@ -84,11 +85,23 @@ export const signup = async ({
     throw new Error('You must provide username, email and password');
   }
 
+  if (password.length < 8) {
+    throw new Error('Password must be at least 8 characters');
+  }
+
+  if (new Date(birthday) > new Date()) {
+    throw new Error('Birthday must be in the past');
+  }
+
+  if (!validateEmail(email)) {
+    throw new Error('Email is not valid');
+  }
+
   // See if a user with the given email exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     // If a user with email does exist, return an error
-    throw new Error('Email is in use');
+    throw new Error('Email is already in use');
   }
 
   const user = new User();
@@ -96,7 +109,7 @@ export const signup = async ({
   user.email = email;
   user.password = password;
   user.gender = gender;
-  user.birthday = birthday;
+  user.birthday = new Date(birthday);
   user.interests = interests;
   user.researchConsent = false;
 
