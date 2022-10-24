@@ -5,15 +5,19 @@ import * as Users from './controllers/user_controller';
 import { requireAuth, requireSignin } from './services/passport';
 import signS3 from './services/s3';
 import * as Answers from './controllers/answer_controller';
+import * as Info from './controllers/info_controller';
 
 dotenv.config({ silent: true });
-
-const { AUTH_SECRET, API_KEY } = process.env;
 
 const router = Router();
 
 router.get('/', (req, res) => {
   res.json({ message: 'welcome to the linguistics games api!' });
+});
+
+router.get('/categories', (req, res) => {
+  const result = Info.getCategories();
+  res.json(result);
 });
 
 router.route('/questions')
@@ -118,6 +122,16 @@ router.route('/users')
   .get(async (req, res) => {
     try {
       const result = await Users.getUsers(req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
+
+router.route('/leaderboard')
+  .get(async (req, res) => {
+    try {
+      const result = await Users.getTopUsers();
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });

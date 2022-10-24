@@ -6,9 +6,6 @@ import User from '../models/user_model';
 dotenv.config({ silent: true });
 
 export async function getUser(id, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
   const user = await User.findById(id).lean();
   if (!user) {
     throw new Error('user not found');
@@ -27,10 +24,13 @@ export async function getUsers(query) {
   return users;
 }
 
+export async function getTopUsers() {
+  // return searched for users, sorted by score
+  const users = await User.find({}).sort({ score: -1 });
+  return users;
+}
+
 export async function updateUser(id, userFields, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
   // hash password if it's being updated
   try {
     if (userFields.password != null) {
@@ -61,12 +61,15 @@ export async function submitConsent(id, consent = true) {
   }
 }
 
-export async function deleteUser(id, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
+export async function deleteUser(id) {
   await User.findByIdAndDelete(id);
   return { msg: `user ${id} deleted successfully.` };
+}
+
+export async function updateScore(id, increment) {
+  console.log(`updating score by ${increment} for user ${id}`);
+  await User.findByIdAndUpdate(id, { $inc: { score: increment } });
+  return { msg: `score of user ${id} updated successfully.` };
 }
 
 export const signin = (user) => {
