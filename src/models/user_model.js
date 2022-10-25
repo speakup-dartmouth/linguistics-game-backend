@@ -18,10 +18,15 @@ const UserSchema = new Schema({
   interests: [String],
   researchConsent: { type: Boolean, default: false },
   score: Number,
+  demographicAttributes: {
+    type: Map,
+    of: String,
+  },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
   timestamps: true,
+  flattenMaps: true,
 });
 
 UserSchema.index({

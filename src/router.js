@@ -126,6 +126,14 @@ router.route('/users')
     } catch (error) {
       res.status(404).json({ error: error.toString() });
     }
+  })
+  .put(requireAuth, async (req, res) => {
+    try {
+      const result = await Users.updateUser(req.user.id, req.body);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.toString() });
+    }
   });
 
 router.route('/leaderboard')
@@ -146,14 +154,6 @@ router.route('/users/:id')
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });
-    }
-  })
-  .put(async (req, res) => {
-    try {
-      const result = await Users.updateUser(req.params.id, req.body, req.query);
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ error: error.toString() });
     }
   })
   .delete(async (req, res) => {

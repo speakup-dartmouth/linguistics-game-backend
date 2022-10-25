@@ -31,7 +31,7 @@ export async function getTopUsers() {
   return users;
 }
 
-export async function updateUser(id, userFields, query) {
+export async function updateUser(id, userFields) {
   // hash password if it's being updated
   try {
     if (userFields.password != null) {
@@ -102,6 +102,13 @@ export const signup = async ({
   if (existingUser) {
     // If a user with email does exist, return an error
     throw new Error('Email is already in use');
+  }
+
+  // See if username is taken
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
+    // If a user with username does exist, return an error
+    throw new Error('Username is already in use');
   }
 
   const user = new User();
