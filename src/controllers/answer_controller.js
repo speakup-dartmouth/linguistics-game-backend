@@ -1,14 +1,15 @@
 import Answer from '../models/answer_model';
 import * as Users from './user_controller';
 
-export async function createAnswer(answerFields) {
+export async function createAnswer(answerFields, user) {
   // await creating a answer
   const answer = new Answer();
-  answer.user = answerFields.user;
+  answer.user = user;
   answer.question = answerFields.question;
   answer.recordingURL = answerFields.recordingURL;
-  answer.upvotes = 0;
-  answer.downvotes = 0;
+  answer.stance = answerFields.stance;
+  answer.upvotes = [];
+  answer.downvotes = [];
 
   // return answer
   try {
@@ -22,6 +23,10 @@ export async function getAnswers(query) {
   if ('u' in query) {
     const answers = await Answer.find({ $or: [{ upvotes: { $in: [query.u] } }, { downvotes: { $in: [query.u] } }] })
       .lean().sort({ createdAt: -1 });
+    return answers;
+  }
+  if ('question' in query) {
+    const answers = await Answer.find({ question: query.question }).lean().sort({ createdAt: -1 });
     return answers;
   }
   // return all answers

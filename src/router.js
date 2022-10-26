@@ -65,9 +65,9 @@ router.route('/questions/:questionID')
   });
 
 router.route('/answers')
-  .post(async (req, res) => {
+  .post(requireAuth, async (req, res) => {
     try {
-      const result = await Answers.createAnswer(req.body);
+      const result = await Answers.createAnswer(req.body, req.user);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });

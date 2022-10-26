@@ -7,6 +7,7 @@ const AnswerSchema = new Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  stance: { type: String },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
