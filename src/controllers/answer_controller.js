@@ -14,7 +14,7 @@ export async function createAnswer(answerFields, user) {
   // return answer
   try {
     const savedAnswer = await answer.save();
-    return savedAnswer;
+    return savedAnswer.populate({ path: 'user', select: 'username' });
   } catch (error) {
     throw new Error(`create answer error: ${error}`);
   }
@@ -26,11 +26,11 @@ export async function getAnswers(query) {
     return answers;
   }
   if ('question' in query) {
-    const answers = await Answer.find({ question: query.question }).lean().sort({ createdAt: -1 });
+    const answers = await Answer.find({ question: query.question }).populate({ path: 'user', select: 'username' }).lean().sort({ createdAt: -1 });
     return answers;
   }
   // return all answers
-  const answers = await Answer.find({})
+  const answers = await Answer.find({}).populate({ path: 'user', select: 'username' })
     .lean().sort({ createdAt: -1 });
   return answers;
 }
