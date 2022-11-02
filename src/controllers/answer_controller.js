@@ -1,14 +1,14 @@
 import Answer from '../models/answer_model';
+import * as Users from './user_controller';
 
-export async function createAnswer(answerFields, query, user) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
-
+export async function createAnswer(answerFields) {
   // await creating a answer
   const answer = new Answer();
-  answer.user = user;
+  answer.user = answerFields.user;
   answer.question = answerFields.question;
+  answer.recordingURL = answerFields.recordingURL;
+  answer.upvotes = 0;
+  answer.downvotes = 0;
 
   // return answer
   try {
@@ -19,13 +19,13 @@ export async function createAnswer(answerFields, query, user) {
   }
 }
 export async function getAnswers(query) {
-  if ('search_term' in query) {
-    const answers = await Answer.find({ $text: { $search: query.search_term } }, '-title -options')
+  if ('u' in query) {
+    const answers = await Answer.find({ $or: [{ upvotes: { $in: [query.u] } }, { downvotes: { $in: [query.u] } }] })
       .lean().sort({ createdAt: -1 });
     return answers;
   }
   // return all answers
-  const answers = await Answer.find({}, '-title -options')
+  const answers = await Answer.find({})
     .lean().sort({ createdAt: -1 });
   return answers;
 }
@@ -39,10 +39,69 @@ export async function getAnswer(id) {
   }
   return answer;
 }
-export async function deleteAnswer(id, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
+
+export async function voteAnswer(id, query, fields) {
+  console.log('voting');
+  console.log(id);
+  if (!query || !query.v) {
+    throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
   }
+  const answer = await Answer.findById(id).lean();
+  if (!answer) {
+    throw new Error('answer not found');
+  }
+  const { user } = fields;
+  const { v } = query;
+  console.log(`vote: ${v}`);
+  const vote = parseInt(v, 10);
+  console.log(`vote: ${vote}`);
+
+  console.log(answer);
+
+  console.log(`answer user: ${answer.user}`);
+  console.log(`user: ${user}`);
+
+  if (answer.user.equals(user)) {
+    throw new Error('user cannot upvote own post');
+  }
+
+  let score = 0;
+
+  if (vote === 1) {
+    answer.downvotes = answer.downvotes.filter((item) => { return !(item.equals(user)); });
+    const filtered = answer.upvotes.filter((a) => { return !a.equals(user); });
+    if (filtered.length !== answer.upvotes.length) {
+      answer.upvotes = filtered;
+      score = -1;
+    } else {
+      answer.upvotes.push(user);
+      score = 1;
+    }
+  } else if (vote === -1) {
+    answer.upvotes = answer.upvotes.filter((item) => { return !(item.equals(user)); });
+    const filtered = answer.downvotes.filter((a) => { return !a.equals(user); });
+    if (filtered.length !== answer.downvotes.length) {
+      answer.downvotes = filtered;
+      score = 1;
+    } else {
+      answer.downvotes.push(user);
+      score = -1;
+    }
+  }
+
+  const answerResult = await Answer.findByIdAndUpdate(id, answer, { returnDocument: 'after' });
+
+  // increment upvotes counter as simple integer
+  const scoreStatus = await Users.updateScore(answer.user, score);
+  if (!scoreStatus || !scoreStatus.msg) {
+    throw new Error('error updating score');
+  }
+  console.log(`score status: ${scoreStatus.msg}`);
+
+  return answerResult;
+}
+
+export async function deleteAnswer(id) {
   // await deleting a answer
   await Answer.findByIdAndDelete(id);
   // return confirmation

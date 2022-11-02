@@ -1,4 +1,6 @@
+/* eslint-disable no-plusplus */
 import Question from '../models/question_model';
+import Answer from '../models/answer_model';
 
 export async function createQuestion(questionFields, query, user) {
   // await creating a question
@@ -6,7 +8,7 @@ export async function createQuestion(questionFields, query, user) {
   question.title = questionFields.title;
   question.description = questionFields.description;
   question.options = questionFields.options;
-
+  question.areas = questionFields.areas;
   // return question
   try {
     const savedQuestion = await question.save();
@@ -21,10 +23,30 @@ export async function getQuestions(query) {
       .lean().sort({ createdAt: -1 });
     return questions;
   }
-  // return all questions
-  const questions = await Question.find({}, '-title -options')
-    .lean().sort({ createdAt: -1 });
-  return questions;
+  // return all questions, sorted by answer count
+  const sortedQuestions = await Answer
+    .aggregate([
+      {
+        $group: {
+          _id: '$question',
+          answerCount: { $sum: 1 },
+        },
+      },
+      { $sort: { answerCount: -1 } },
+    ]);
+
+  const allQuestions = await Question.find({}).lean();
+  const a = sortedQuestions.concat(allQuestions).concat();
+  for (let i = 0; i < a.length; ++i) {
+    for (let j = i + 1; j < a.length; ++j) {
+      if (a[i]._id.equals(a[j]._id)) {
+        a[j].answerCount = a[i].answerCount;
+        a[i] = a[j];
+        a.splice(j--, 1);
+      }
+    }
+  }
+  return a;
 }
 
 export async function getQuestion(id) {

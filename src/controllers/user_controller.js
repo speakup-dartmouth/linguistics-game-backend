@@ -2,13 +2,11 @@ import jwt from 'jwt-simple';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs/dist/bcrypt';
 import User from '../models/user_model';
+import { validateEmail } from '../common/auth_utils';
 
 dotenv.config({ silent: true });
 
 export async function getUser(id, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
   const user = await User.findById(id).lean();
   if (!user) {
     throw new Error('user not found');
@@ -27,10 +25,13 @@ export async function getUsers(query) {
   return users;
 }
 
-export async function updateUser(id, userFields, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
-  }
+export async function getTopUsers() {
+  // return searched for users, sorted by score
+  const users = await User.find({}).sort({ score: -1 });
+  return users;
+}
+
+export async function updateUser(id, userFields) {
   // hash password if it's being updated
   try {
     if (userFields.password != null) {
@@ -51,35 +52,74 @@ export async function updateUser(id, userFields, query) {
   }
 }
 
-export async function deleteUser(id, query) {
-  if (!('key' in query) || query.key !== process.env.API_KEY) {
-    throw new Error('Please provide a valid API Key');
+export async function submitConsent(id, consent = true) {
+  try {
+    const user = await User.findByIdAndUpdate(id, { researchConsent: consent }, { returnDocument: 'after' });
+    return user;
+  } catch (error) {
+    console.log(error);
+    throw new Error(`update user error: ${error}`);
   }
+}
+
+export async function deleteUser(id) {
   await User.findByIdAndDelete(id);
   return { msg: `user ${id} deleted successfully.` };
+}
+
+export async function updateScore(id, increment) {
+  console.log(`updating score by ${increment} for user ${id}`);
+  await User.findByIdAndUpdate(id, { $inc: { score: increment } });
+  return { msg: `score of user ${id} updated successfully.` };
 }
 
 export const signin = (user) => {
   return { token: tokenForUser(user), id: user.id };
 };
 
-// note the lovely destructuring here indicating that we are passing in an object with these 3 keys
-export const signup = async ({ username, email, password }) => {
+// note the lovely destructuring here indicating that we are passing in an object with these keys
+export const signup = async ({
+  username, email, password, gender, birthday, interests,
+}) => {
   if (!username || !email || !password) {
     throw new Error('You must provide username, email and password');
+  }
+
+  if (password.length < 8) {
+    throw new Error('Password must be at least 8 characters');
+  }
+
+  if (new Date(birthday) > new Date()) {
+    throw new Error('Birthday must be in the past');
+  }
+
+  if (!validateEmail(email)) {
+    throw new Error('Email is not valid');
   }
 
   // See if a user with the given email exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     // If a user with email does exist, return an error
-    throw new Error('Email is in use');
+    throw new Error('Email is already in use');
+  }
+
+  // See if username is taken
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
+    // If a user with username does exist, return an error
+    throw new Error('Username is already in use');
   }
 
   const user = new User();
   user.username = username;
   user.email = email;
   user.password = password;
+  user.gender = gender;
+  user.birthday = new Date(birthday);
+  user.interests = interests;
+  user.researchConsent = false;
+
   await user.save();
   return { token: tokenForUser(user), id: user.id };
 };
