@@ -2,13 +2,14 @@
 import Question from '../models/question_model';
 import Answer from '../models/answer_model';
 
-export async function createQuestion(questionFields, query, user) {
+export async function createQuestion(questionFields) {
   // await creating a question
   const question = new Question();
   question.title = questionFields.title;
   question.description = questionFields.description;
   question.options = questionFields.options;
-  question.areas = questionFields.areas;
+  question.categories = questionFields.categories;
+  question.photoUrl = questionFields.photoUrl;
   // return question
   try {
     const savedQuestion = await question.save();

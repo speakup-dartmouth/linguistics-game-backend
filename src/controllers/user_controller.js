@@ -78,7 +78,7 @@ export const signin = (user) => {
 
 // note the lovely destructuring here indicating that we are passing in an object with these keys
 export const signup = async ({
-  username, email, password, gender, birthday, interests,
+  username, email, password, gender, birthday, interests, location,
 }) => {
   if (!username || !email || !password) {
     throw new Error('You must provide username, email and password');
@@ -98,6 +98,7 @@ export const signup = async ({
   user.gender = gender;
   user.birthday = birthday;
   user.interests = interests;
+  user.location = location;
   user.researchConsent = false;
 
   await user.save();
