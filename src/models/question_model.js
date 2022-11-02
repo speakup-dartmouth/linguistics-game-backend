@@ -6,6 +6,7 @@ const QuestionSchema = new Schema({
     required: true,
   },
   description: String,
+  photoUrl: String,
   options: [String],
   areas: [String],
 }, {

@@ -7,6 +7,7 @@ const AnswerSchema = new Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  stance: { type: String },
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
@@ -23,9 +24,9 @@ AnswerSchema.virtual('downvoteCount').get(function () {
 
 // to do!
 AnswerSchema.methods.getUserVoteStatus = function (userID) {
-  if (this.model('upvotes').contains(userID)) {
+  if (this.upvotes.some((upvote) => { return upvote.equals(userID); })) {
     return 1;
-  } else if (this.model('downvotes').contains(userID)) {
+  } else if (this.downvotes.some((downvote) => { return downvote.equals(userID); })) {
     return -1;
   }
   return 0;
