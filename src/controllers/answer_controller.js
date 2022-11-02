@@ -46,7 +46,7 @@ export async function getAnswer(id) {
   return answer;
 }
 
-export async function voteAnswer(id, query, user) {
+export async function voteAnswer(id, query, userID) {
   console.log('voting');
   console.log(id);
   if (!query || !query.v) {
@@ -55,6 +55,10 @@ export async function voteAnswer(id, query, user) {
   const answer = await Answer.findById(id);
   if (!answer) {
     throw new Error('answer not found');
+  }
+  const user = await Users.findById(userID);
+  if (!user) {
+    throw new Error('user not found');
   }
   const { v } = query;
   console.log(`vote: ${v}`);
@@ -65,9 +69,9 @@ export async function voteAnswer(id, query, user) {
   console.log(answer);
 
   console.log(`answer user: ${answer.user}`);
-  console.log(`user: ${user}`);
+  console.log(`user: ${user._id}`);
 
-  if (answer.user.equals(user)) {
+  if (answer.user.equals(user._id)) {
     throw new Error('user cannot upvote own post');
   }
 
