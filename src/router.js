@@ -73,9 +73,9 @@ router.route('/answers')
       res.status(500).json({ error: error.toString() });
     }
   })
-  .get(async (req, res) => {
+  .get(requireAuth, async (req, res) => {
     try {
-      const result = await Answers.getAnswers(req.query);
+      const result = await Answers.getAnswers(req.query, req.user);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });
@@ -109,9 +109,9 @@ router.route('/answers/:answerID')
   });
 
 router.route('/answers/:answerID/vote')
-  .post(async (req, res) => {
+  .post(requireAuth, async (req, res) => {
     try {
-      const result = await Answers.voteAnswer(req.params.answerID, req.query, req.body);
+      const result = await Answers.voteAnswer(req.params.answerID, req.query, req.user);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });

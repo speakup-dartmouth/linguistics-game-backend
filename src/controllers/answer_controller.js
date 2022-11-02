@@ -19,15 +19,16 @@ export async function createAnswer(answerFields, user) {
     throw new Error(`create answer error: ${error}`);
   }
 }
-export async function getAnswers(query) {
+export async function getAnswers(query, user) {
   if ('u' in query) {
     const answers = await Answer.find({ $or: [{ upvotes: { $in: [query.u] } }, { downvotes: { $in: [query.u] } }] })
       .lean().sort({ createdAt: -1 });
     return answers;
   }
   if ('question' in query) {
-    const answers = await Answer.find({ question: query.question }).populate({ path: 'user', select: 'username' }).lean().sort({ createdAt: -1 });
-    return answers;
+    const answers = await Answer.find({ question: query.question }).populate({ path: 'user', select: 'username' }).sort({ createdAt: -1 });
+    const answersList = answers.map((answer) => { return { ...answer.toObject(), userVoteStatus: answer.getUserVoteStatus(user._id) }; });
+    return answersList;
   }
   // return all answers
   const answers = await Answer.find({}).populate({ path: 'user', select: 'username' })
@@ -45,20 +46,20 @@ export async function getAnswer(id) {
   return answer;
 }
 
-export async function voteAnswer(id, query, fields) {
+export async function voteAnswer(id, query, user) {
   console.log('voting');
   console.log(id);
   if (!query || !query.v) {
     throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
   }
-  const answer = await Answer.findById(id).lean();
+  const answer = await Answer.findById(id);
   if (!answer) {
     throw new Error('answer not found');
   }
-  const { user } = fields;
   const { v } = query;
   console.log(`vote: ${v}`);
   const vote = parseInt(v, 10);
+
   console.log(`vote: ${vote}`);
 
   console.log(answer);
@@ -73,8 +74,8 @@ export async function voteAnswer(id, query, fields) {
   let score = 0;
 
   if (vote === 1) {
-    answer.downvotes = answer.downvotes.filter((item) => { return !(item.equals(user)); });
-    const filtered = answer.upvotes.filter((a) => { return !a.equals(user); });
+    answer.downvotes = answer.downvotes.filter((item) => { return !(item.equals(user._id)); });
+    const filtered = answer.upvotes.filter((a) => { return !a.equals(user._id); });
     if (filtered.length !== answer.upvotes.length) {
       answer.upvotes = filtered;
       score = -1;
@@ -83,8 +84,8 @@ export async function voteAnswer(id, query, fields) {
       score = 1;
     }
   } else if (vote === -1) {
-    answer.upvotes = answer.upvotes.filter((item) => { return !(item.equals(user)); });
-    const filtered = answer.downvotes.filter((a) => { return !a.equals(user); });
+    answer.upvotes = answer.upvotes.filter((item) => { return !(item.equals(user._id)); });
+    const filtered = answer.downvotes.filter((a) => { return !a.equals(user._id); });
     if (filtered.length !== answer.downvotes.length) {
       answer.downvotes = filtered;
       score = 1;
@@ -94,7 +95,7 @@ export async function voteAnswer(id, query, fields) {
     }
   }
 
-  const answerResult = await Answer.findByIdAndUpdate(id, answer, { returnDocument: 'after' });
+  const answerResult = await Answer.findByIdAndUpdate(id, answer, { returnDocument: 'after' }).populate({ path: 'user', select: 'username' });
 
   // increment upvotes counter as simple integer
   const scoreStatus = await Users.updateScore(answer.user, score);
@@ -103,7 +104,7 @@ export async function voteAnswer(id, query, fields) {
   }
   console.log(`score status: ${scoreStatus.msg}`);
 
-  return answerResult;
+  return { ...answerResult.toObject(), userVoteStatus: answerResult.getUserVoteStatus(user._id) };
 }
 
 export async function deleteAnswer(id) {
