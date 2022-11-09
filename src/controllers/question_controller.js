@@ -18,12 +18,24 @@ export async function createQuestion(questionFields, query, user) {
   }
 }
 export async function getQuestions(query) {
-  if ('search_term' in query) {
-    const questions = await Question.find({ $text: { $search: query.search_term } }, '-title -options')
-      .lean().sort({ createdAt: -1 });
+  if ('q' in query) {
+    console.log(`searching for: ${query.q}`);
+    // const questions = await Question.find({ $text: { $search: query.q } }, '-title -options')
+    //   .lean().sort({ createdAt: -1 });
+    // const questions = await Question.find({ $index: 'default', $text: { $search: query.q } });
+    // const questions = await Question.find({ $text: { $search: query.q } });
+    const questions = await Question.find({
+      $or: [
+        { $text: { $search: query.q } },
+        { title: { $regex: `^${query.q}` } },
+        { description: { $regex: `^${query.q}` } },
+        { options: { $regex: `^${query.q}` } },
+        { areas: { $regex: `^${query.q}` } },
+      ],
+    });
     return questions;
   }
-  // return all questions, sorted by answer count
+  // return all questions, sorted by answer countnpm start
   const sortedQuestions = await Answer
     .aggregate([
       {

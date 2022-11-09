@@ -7,18 +7,27 @@ const QuestionSchema = new Schema({
   },
   description: String,
   photoUrl: String,
-  options: [String],
-  areas: [String],
+  options: [{
+    type: String,
+    index: true,
+  }],
+  areas: [{
+    type: String,
+    index: true,
+  }],
 }, {
   toObject: { virtuals: true },
   toJSON: { virtuals: true },
   timestamps: true,
 });
 
-const QuestionModel = mongoose.model('Question', QuestionSchema);
-
 QuestionSchema.index({
-  title: 'text', areas: 'text', options: 'text', answers: 'text',
+  title: 'text', areas: 'text', options: 'text', description: 'text',
 });
+QuestionSchema.index({
+  title: 1, areas: 1, options: 1, description: 1,
+});
+
+const QuestionModel = mongoose.model('Question', QuestionSchema);
 
 export default QuestionModel;

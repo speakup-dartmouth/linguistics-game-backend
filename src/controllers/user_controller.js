@@ -15,9 +15,9 @@ export async function getUser(id, query) {
 }
 
 export async function getUsers(query) {
-  // return searched for users if search_term exists
-  if ('search_term' in query) {
-    const posts = await User.find({ username: { $regex: query.search_term, $options: 'i' } }).lean();
+  // return searched for users if q exists
+  if ('q' in query) {
+    const posts = await User.find({ username: { $regex: query.q, $options: 'i' } }).lean();
     return posts;
   }
 
@@ -27,7 +27,9 @@ export async function getUsers(query) {
 
 export async function getTopUsers() {
   // return searched for users, sorted by score
-  const users = await User.find({}).sort({ score: -1 });
+  const users = await User.find({}, 'username score').sort({ score: -1 }).limit(10);
+  console.log('users!!!!');
+  console.log(users);
   return users;
 }
 
