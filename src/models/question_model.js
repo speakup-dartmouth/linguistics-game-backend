@@ -22,10 +22,10 @@ const QuestionSchema = new Schema({
 });
 
 QuestionSchema.index({
-  title: 'text', areas: 'text', options: 'text', description: 'text',
+  title: 'text', description: 'text', areas: 'text', options: 'text',
 });
 QuestionSchema.index({
-  title: 1, areas: 1, options: 1, description: 1,
+  title: 1, description: 1, areas: 1, options: 1,
 });
 
 const QuestionModel = mongoose.model('Question', QuestionSchema);
