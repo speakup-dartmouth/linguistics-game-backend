@@ -11,7 +11,7 @@ const QuestionSchema = new Schema({
     type: String,
     index: true,
   }],
-  areas: [{
+  categories: [{
     type: String,
     index: true,
   }],
@@ -22,10 +22,10 @@ const QuestionSchema = new Schema({
 });
 
 QuestionSchema.index({
-  title: 'text', description: 'text', areas: 'text', options: 'text',
+  title: 'text', description: 'text', categories: 'text', options: 'text',
 });
 QuestionSchema.index({
-  title: 1, description: 1, areas: 1, options: 1,
+  title: 1, description: 1, categories: 1, options: 1,
 });
 
 const QuestionModel = mongoose.model('Question', QuestionSchema);

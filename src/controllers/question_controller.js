@@ -8,7 +8,7 @@ export async function createQuestion(questionFields, query, user) {
   question.title = questionFields.title;
   question.description = questionFields.description;
   question.options = questionFields.options;
-  question.areas = questionFields.areas;
+  question.categories = questionFields.categories;
   // return question
   try {
     const savedQuestion = await question.save();
@@ -22,8 +22,12 @@ export async function getQuestions(query) {
     console.log(`searching for: ${query.q}`);
     const questions = await Question.find({ $text: { $search: query.q } });
     return questions;
+  } else if ('c' in query) {
+    console.log(`searching for category: ${query.c}`);
+    const questions = await Question.find({ categories: { $in: [query.c] } });
+    return questions;
   }
-  // return all questions, sorted by answer countnpm start
+  // return all questions, sorted by answer count
   const sortedQuestions = await Answer
     .aggregate([
       {
