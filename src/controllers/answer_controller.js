@@ -38,11 +38,7 @@ export async function getAnswers(query, user) {
 
 export async function getAnswersForResearch(query) {
   const users = await Users.getUserIDs(query);
-  console.log('users');
-  console.log(users);
-  const users_manual = ['63597cb06ea04c08c9b09ca5', '6359a08146d85a65cf1f9fa2', '6362ec83ee56d2bd81c88d9f', '6362eefbee56d2bd81c88fd8', '6363ee31c00729d7084083fb',
-  ];
-  const answers = await Answer.find({ user: { $in: users_manual } }).sort({ createdAt: -1 });
+  const answers = await Answer.find({ user: { $in: users } }).sort({ createdAt: -1 });
   return answers;
 }
 
