@@ -19,11 +19,15 @@ export async function createQuestion(questionFields, query, user) {
 }
 export async function getQuestions(query) {
   if ('q' in query) {
-    console.log(`searching for: ${query.q}`);
-    const questions = await Question.find({ $text: { $search: query.q } });
+    const questions = await Question.find({
+      $or: [{ title: { $regex: query.q, $options: 'i' } },
+        { description: { $regex: query.q, $options: 'i' } },
+        { categories: { $in: [query.q] } },
+        { options: { $in: [query.q] } },
+      ],
+    });
     return questions;
   } else if ('c' in query) {
-    console.log(`searching for category: ${query.c}`);
     const questions = await Question.find({ categories: { $in: [query.c] } });
     return questions;
   }
