@@ -19,10 +19,26 @@ export async function getUsers(query) {
   if ('search_term' in query) {
     const posts = await User.find({ username: { $regex: query.search_term, $options: 'i' } }).lean();
     return posts;
+  } else {
+    console.log(query);
   }
-
   const users = await User.find({}, '-email -username -password');
   return users;
+}
+
+export async function getUserIDs(query) {
+  const queries = [{ researchConsent: true }]; // must have consent for research
+  if (query) {
+    Object.entries(query).forEach((e) => {
+      if (query[e[0]].constructor === Array) {
+        queries.push({ [`demographicAttributes.${e[0]}`]: { $in: e[1] } });
+      } else {
+        queries.push({ [`demographicAttributes.${e[0]}`]: e[1] });
+      }
+    });
+  }
+  const userIDs = await User.find({ $and: queries }).distinct('_id');
+  return userIDs;
 }
 
 export async function getTopUsers() {

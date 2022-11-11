@@ -226,6 +226,16 @@ router.get('/user-info', requireAuth, async (req, res) => {
   }
 });
 
+router.route('/research')
+  .get(async (req, res) => {
+    try {
+      const result = Answers.getAnswersForResearch(req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
+
 router.get('/sign-s3', signS3);
 
 export default router;
