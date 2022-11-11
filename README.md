@@ -1,70 +1,92 @@
 # 🗣 Linguistics Games Backend
 
-[Project Description]
+Linguistics Games, a.k.a. Speak Up, is an innovative gameified mobile app that invites users to play via voice-controlled mechanisms. They can choose a stance to respond to a variety of questions, as well as upvote and downvote other users' posts. With the user's consent, these voice samples are anonymized aggregated and together to form large-scale datasets, with whole new magnitudes of `N > 10,000`. The aim of this app is to empower every researcher with larger and more comprehensive datasets for richer hypotheses, and in particular cutting-edge sociolinguistic analysis. Ultimately, the impact of this app can stretch far beyond linguistics. Other fields like economics, sociology, anthropology all experience the same challenge of small sample sizes. This technique can inspire similar approaches in these other fields, and usher in a new era of computational research.
 
 ## Designs
-[Screenshot description]
 
-[Link to the project Figma](https://apple.com)
-
-[2-4 screenshots from the app]
+[See project Figma](https://www.figma.com/file/rA2O0gfeSZ6mFjTjsPulWP/Linguistics-Games-22F)
 
 ## Architecture
 ### Tech Stack 🥞
-The app is built using React-Native
+The app is built using Express, Mongoose, and Node.
 
-[Description of any notable added services]
-
-[Link to other repos that comprise the project (optional)](https://github.com/)
-
-#### Packages 📦
-* [List of notable packages with links]
-
-### Style
-[Describe notable code style conventions]
-
-We are using [CS52's React-Native ESLint Configuration](https://gist.github.com/timofei7/c8df5cc69f44127afb48f5d1dffb6c84)
+[Frontend Repo](https://github.com/)
 
 ### Setup
 
-1. Add the file `.env` in the root directory
-2. Set `AUTH_SECRET` to any string
-3. Set `MONGODB_URI` to `mongodb://localhost:27017/<project-name>`
+1. Create a `.env` file in the root directory
+2. In the `.env` file, set `AUTH_SECRET` to any string, 
+3. set `MONGODB_URI` to `mongodb://localhost:27017/<project-name>` for local dev OR to the deployed mongodb uri link,
+4. and add the `API_KEY` 
+
+
+## Running a local server 
+1. After cloning the repo, `cd` into the repo directory
+2. `npm install`
+3. `npm run dev`
+This will run a local server of the database at (most likely) localhost:9090
 
 ### Additional notes
 
 You may need to update `node` in order to install all the packages. This can be easily done [here](https://nodejs.org/en/)
 
 ### Data Models
-[Brief escription of typical data models.]
 
-[Detailed description should be moved to the repo's Wiki page]
+#### Question
+- title*: String
+- description: String
+- photoUrl: String
+- options: [String]
+- areas: [String]
+
+#### Answer
+- question*: QuestionId
+- recordingURL*: link to S3 URL hosting recording
+- user*: UserId
+- upvotes: [UserId]
+- downvotes: [UserId]
+- stance: String (one of the question's `options`)
+
+#### User
+- email*: String
+- username*: String
+- bio: String
+- password*: String (hashed)
+- gender: String, enum ['male', 'female', 'nonbinary', 'other']
+- birthday: Date
+- interests: [String] - maps to question categories
+- researchConsent: Boolean (defaults to false)
+- score: Number (to be used in leaderboard)
+- demographicAttributes: Map of Strings - e.g. {'location':'New Hampshire', 'languagesSpoken':5}
+
+#### Info
+- hosts list of static categories
 
 ### File Structure
 
 ```
 ├──[Top Level]/                  # root directory
-|  └──[File]                     # brief description of file
-|  └──[Folder1]/                 # brief description of folder 
-|  └──[Folder2]/                 # brief description of folder
-[etc...]
+|  └──[.env]                     # contains AUTH_SECRET, API_KEY, MONGODB_URI
+|  └──[src]/                     # source directory
+|     └──[common]/               # hosts modules used in other packages
+|     └──[controllers]/          # hosts question, answer, user, and info controllers
+|     └──[models]/               # hosts question, answer, and user models
+|     └──[services]/             # hosts passport and s3 services
+|     └──[router.js]             # set up routes, calling controllers from `controllers` directory
+|     └──[server.js]             # initialize app and start server
 ```
 
 For more detailed documentation on our file structure and specific functions in the code, feel free to check the project files themselves.
 
 ## Deployment 🚀
-[Where is the app deployed? i.e. Expo, Surge, TestFlight etc.]
 
-[What are the steps to re-deploy the project with any new changes?]
+Deployed on Render, [https://linguistics-games.onrender.com/](https://linguistics-games.onrender.com/)
 
-[How does one get access to the deployed project?]
+See Notion Handoff Document for Credentials.
 
 ## Authors
 Isabella Hochschild '25, Dev Mentor
 Tyler Vergho '23, Dev
-
-## Acknowledgments 🤝
-We would like to thank ...for their help and dedication to this project.
 
 ---
 Designed and developed by [@DALI Lab](https://github.com/dali-lab)
