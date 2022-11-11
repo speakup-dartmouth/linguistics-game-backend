@@ -82,7 +82,7 @@ For more detailed documentation on our file structure and specific functions in 
 
 Deployed on Render, [https://linguistics-games.onrender.com/](https://linguistics-games.onrender.com/)
 
-See Notion Handoff Document for Credentials.
+See Notion Handoff Document for credentials.
 
 ## Authors
 Isabella Hochschild '25, Dev Mentor
