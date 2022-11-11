@@ -28,6 +28,10 @@ export async function getQuestions(query) {
     });
     return questions;
   } else if ('c' in query) {
+    if (query.c.constructor === Array) { // if multiple categories are given, search for all matches
+      const questions = await Question.find({ categories: { $in: query.c } });
+      return questions;
+    }
     const questions = await Question.find({ categories: { $in: [query.c] } });
     return questions;
   }
