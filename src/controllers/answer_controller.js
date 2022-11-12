@@ -46,7 +46,7 @@ export async function getAnswer(id) {
   return answer;
 }
 
-export async function voteAnswer(id, query, userID) {
+export async function voteAnswer(id, query, user) {
   console.log('voting');
   console.log(id);
   if (!query || !query.v) {
@@ -56,10 +56,7 @@ export async function voteAnswer(id, query, userID) {
   if (!answer) {
     throw new Error('answer not found');
   }
-  const user = await Users.findById(userID);
-  if (!user) {
-    throw new Error('user not found');
-  }
+
   const { v } = query;
   console.log(`vote: ${v}`);
   const vote = parseInt(v, 10);
