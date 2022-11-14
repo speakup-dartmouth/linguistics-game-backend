@@ -26,11 +26,40 @@ export async function getUsers(query) {
   return users;
 }
 
+function getBirthdayMin(age) {
+  const dateOfBirth = new Date(new Date().getTime() - age * 3.154e+10 - 364 * 8.64e+7);
+  return dateOfBirth;
+}
+
+function getBirthdayMax(age) {
+  const dateOfBirth = new Date(new Date().getTime() - age * 3.154e+10);
+  return dateOfBirth;
+}
+
 export async function getUserIDs(query) {
   const queries = [{ researchConsent: true }]; // must have consent for research
   if (query) {
+    console.log('yus query');
+    if ('age' in query) {
+      queries.push({
+        birthday: {
+          $gte: getBirthdayMin(query.age),
+          $lt: getBirthdayMax(query.age),
+        },
+      });
+      delete query.age;
+    }
+    if ('gender' in query) {
+      queries.push({ gender: query.gender });
+      delete query.gender;
+    }
+
+    Object.entries(query).filter(([key, value]) => { return value !== null; });
     Object.entries(query).forEach((e) => {
-      if (query[e[0]] !== 'isBilingualOrMultilingual' && query[e[1]] !== null) {
+      console.log(query[e[0]]);
+      console.log(query[e[1]]);
+      // eslint-disable-next-line
+      if (query[e[0]] && (query[e[1]] != null || query[e[1]] != '' || typeof query[e[1]] === 'boolean')) {
         if (query[e[0]].constructor === Array) {
           queries.push({ [`demographicAttributes.${e[0]}`]: { $in: e[1] } });
         } else {
