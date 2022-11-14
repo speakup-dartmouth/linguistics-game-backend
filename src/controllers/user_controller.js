@@ -30,13 +30,16 @@ export async function getUserIDs(query) {
   const queries = [{ researchConsent: true }]; // must have consent for research
   if (query) {
     Object.entries(query).forEach((e) => {
-      if (query[e[0]].constructor === Array) {
-        queries.push({ [`demographicAttributes.${e[0]}`]: { $in: e[1] } });
-      } else {
-        queries.push({ [`demographicAttributes.${e[0]}`]: e[1] });
+      if (query[e[0]] !== 'isBilingualOrMultilingual' && query[e[1]] !== null) {
+        if (query[e[0]].constructor === Array) {
+          queries.push({ [`demographicAttributes.${e[0]}`]: { $in: e[1] } });
+        } else {
+          queries.push({ [`demographicAttributes.${e[0]}`]: e[1] });
+        }
       }
     });
   }
+  console.log(queries);
   const userIDs = await User.find({ $and: queries }).distinct('_id');
   return userIDs;
 }
@@ -63,7 +66,6 @@ export async function updateUser(id, userFields) {
     const user = await User.findByIdAndUpdate(id, userFields, { returnDocument: 'after' });
     return user;
   } catch (error) {
-    console.log(error);
     throw new Error(`update user error: ${error}`);
   }
 }
@@ -90,7 +92,7 @@ export async function updateScore(id, increment) {
 }
 
 export const signin = (user) => {
-  return { token: tokenForUser(user), id: user.id };
+  return { token: tokenForUser(user), id: user.id, role: user.role };
 };
 
 // note the lovely destructuring here indicating that we are passing in an object with these keys
@@ -135,6 +137,7 @@ export const signup = async ({
   user.birthday = new Date(birthday);
   user.interests = interests;
   user.researchConsent = false;
+  user.role = 'USER';
 
   await user.save();
   return { token: tokenForUser(user), id: user.id };

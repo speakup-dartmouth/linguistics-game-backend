@@ -14,6 +14,10 @@ const UserSchema = new Schema({
     type: String,
     enum: ['male', 'female', 'nonbinary', 'other'],
   },
+  role: {
+    type: String,
+    enum: ['USER', 'ADMIN'],
+  },
   birthday: Date,
   interests: [String],
   researchConsent: { type: Boolean, default: false },

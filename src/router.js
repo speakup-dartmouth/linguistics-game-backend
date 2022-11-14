@@ -193,6 +193,7 @@ router.post('/signin', requireSignin, async (req, res) => {
       id: result.id,
       email: req.user.email,
       username: req.user.username,
+      role: result.role,
     });
   } catch (error) {
     res.status(422).send({ error: error.toString() });

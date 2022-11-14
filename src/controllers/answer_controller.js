@@ -53,8 +53,6 @@ export async function getAnswer(id) {
 }
 
 export async function voteAnswer(id, query, userID) {
-  console.log('voting');
-  console.log(id);
   if (!query || !query.v) {
     throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
   }
@@ -67,15 +65,7 @@ export async function voteAnswer(id, query, userID) {
     throw new Error('user not found');
   }
   const { v } = query;
-  console.log(`vote: ${v}`);
   const vote = parseInt(v, 10);
-
-  console.log(`vote: ${vote}`);
-
-  console.log(answer);
-
-  console.log(`answer user: ${answer.user}`);
-  console.log(`user: ${user._id}`);
 
   if (answer.user.equals(user._id)) {
     throw new Error('user cannot upvote own post');
