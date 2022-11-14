@@ -39,7 +39,6 @@ function getBirthdayMax(age) {
 export async function getUserIDs(query) {
   const queries = [{ researchConsent: true }]; // must have consent for research
   if (query) {
-    console.log('yus query');
     if ('age' in query) {
       queries.push({
         birthday: {
@@ -68,7 +67,6 @@ export async function getUserIDs(query) {
       }
     });
   }
-  console.log(queries);
   const userIDs = await User.find({ $and: queries }).distinct('_id');
   return userIDs;
 }
