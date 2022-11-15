@@ -37,9 +37,11 @@ function getBirthdayMax(age) {
 }
 
 export async function getUserIDs(query) {
+  Object.entries(query).filter(([key, value]) => { return value !== null; });
   const queries = [{ researchConsent: true }]; // must have consent for research
   if (query) {
-    if ('age' in query) {
+    // eslint-disable-next-line eqeqeq
+    if ('age' in query && query.age != null && query.age != '') {
       queries.push({
         birthday: {
           $gte: getBirthdayMin(query.age),
@@ -53,7 +55,6 @@ export async function getUserIDs(query) {
       delete query.gender;
     }
 
-    Object.entries(query).filter(([key, value]) => { return value !== null; });
     Object.entries(query).forEach((e) => {
       // eslint-disable-next-line
       if (query[e[0]] && (query[e[1]] != null || query[e[1]] != '' || typeof query[e[1]] === 'boolean')) {
@@ -65,7 +66,9 @@ export async function getUserIDs(query) {
       }
     });
   }
+  console.log(queries);
   const userIDs = await User.find({ $and: queries }).distinct('_id');
+  console.log(userIDs);
   return userIDs;
 }
 

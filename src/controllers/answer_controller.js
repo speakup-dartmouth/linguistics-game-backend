@@ -1,5 +1,6 @@
 import Answer from '../models/answer_model';
 import * as Users from './user_controller';
+import User from '../models/user_model';
 
 export async function createAnswer(answerFields, user) {
   // await creating a answer
@@ -67,7 +68,7 @@ export async function voteAnswer(id, query, userID) {
     throw new Error('answer not found');
   }
 
-  const user = await Users.findById(userID);
+  const user = await User.findById(userID);
   if (!user) {
     throw new Error('user not found');
   }

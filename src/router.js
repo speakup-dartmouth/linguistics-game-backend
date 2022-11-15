@@ -231,7 +231,9 @@ router.get('/user-info', requireAuth, async (req, res) => {
 router.route('/research')
   .get(async (req, res) => {
     try {
+      console.log(req.query);
       const result = await Answers.getAnswersForResearch(req.query);
+      console.log(result);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });
