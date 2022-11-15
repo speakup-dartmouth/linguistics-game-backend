@@ -66,10 +66,12 @@ export async function voteAnswer(id, query, userID) {
   if (!answer) {
     throw new Error('answer not found');
   }
+
   const user = await Users.findById(userID);
   if (!user) {
     throw new Error('user not found');
   }
+
   const { v } = query;
   const vote = parseInt(v, 10);
 
