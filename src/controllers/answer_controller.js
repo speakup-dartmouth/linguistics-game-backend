@@ -58,7 +58,7 @@ export async function getAnswer(id) {
   return answer;
 }
 
-export async function voteAnswer(id, query, userID) {
+export async function voteAnswer(id, query, user) {
   if (!query || !query.v) {
     throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
   }
@@ -67,7 +67,6 @@ export async function voteAnswer(id, query, userID) {
     throw new Error('answer not found');
   }
 
-  const user = await Users.findById(userID);
   if (!user) {
     throw new Error('user not found');
   }
