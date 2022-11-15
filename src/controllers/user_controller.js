@@ -55,8 +55,6 @@ export async function getUserIDs(query) {
 
     Object.entries(query).filter(([key, value]) => { return value !== null; });
     Object.entries(query).forEach((e) => {
-      console.log(query[e[0]]);
-      console.log(query[e[1]]);
       // eslint-disable-next-line
       if (query[e[0]] && (query[e[1]] != null || query[e[1]] != '' || typeof query[e[1]] === 'boolean')) {
         if (query[e[0]].constructor === Array) {
@@ -68,6 +66,11 @@ export async function getUserIDs(query) {
     });
   }
   const userIDs = await User.find({ $and: queries }).distinct('_id');
+  return userIDs;
+}
+
+export async function getUserIDsManual(query) {
+  const userIDs = await User.find(query).distinct('_id');
   return userIDs;
 }
 

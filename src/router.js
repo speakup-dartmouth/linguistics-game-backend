@@ -231,7 +231,16 @@ router.route('/research')
   .get(async (req, res) => {
     try {
       const result = await Answers.getAnswersForResearch(req.query);
-      // console.log(result); // ok
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
+
+router.route('/mongo-research')
+  .get(async (req, res) => {
+    try {
+      const result = await Answers.getAnswersForResearchManual(req.query);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });

@@ -42,6 +42,12 @@ export async function getAnswersForResearch(query) {
   return answers;
 }
 
+export async function getAnswersForResearchManual(query) {
+  const users = await Users.getUserIDsManual(query);
+  const answers = await Answer.find({ user: { $in: users } }).sort({ createdAt: -1 });
+  return answers;
+}
+
 export async function getAnswer(id) {
   // await finding one answer
   const answer = await Answer.findById(id).lean();
