@@ -77,6 +77,7 @@ export async function getUserIDsManual(query) {
 export async function getTopUsers() {
   // return searched for users, sorted by score
   const users = await User.find({}).sort({ score: -1 });
+  console.log(users);
   return users;
 }
 
