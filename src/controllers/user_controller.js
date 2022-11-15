@@ -15,9 +15,9 @@ export async function getUser(id, query) {
 }
 
 export async function getUsers(query) {
-  // return searched for users if search_term exists
-  if ('search_term' in query) {
-    const posts = await User.find({ username: { $regex: query.search_term, $options: 'i' } }).lean();
+  // return searched for users if q exists
+  if ('q' in query) {
+    const posts = await User.find({ username: { $regex: query.q, $options: 'i' } }).lean();
     return posts;
   } else {
     console.log(query);
@@ -76,8 +76,7 @@ export async function getUserIDsManual(query) {
 
 export async function getTopUsers() {
   // return searched for users, sorted by score
-  const users = await User.find({}).sort({ score: -1 });
-  console.log(users);
+  const users = await User.find({}, 'username score').sort({ score: -1 }).limit(25); // grab just top 25 users
   return users;
 }
 
