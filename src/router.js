@@ -193,6 +193,7 @@ router.post('/signin', requireSignin, async (req, res) => {
       id: result.id,
       email: req.user.email,
       username: req.user.username,
+      role: result.role,
     });
   } catch (error) {
     res.status(422).send({ error: error.toString() });
@@ -225,6 +226,26 @@ router.get('/user-info', requireAuth, async (req, res) => {
     res.status(422).send({ error: error.toString() });
   }
 });
+
+router.route('/research')
+  .get(async (req, res) => {
+    try {
+      const result = await Answers.getAnswersForResearch(req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
+
+router.route('/mongo-research')
+  .get(async (req, res) => {
+    try {
+      const result = await Answers.getAnswersForResearchManual(req.query);
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() });
+    }
+  });
 
 router.get('/sign-s3', signS3);
 

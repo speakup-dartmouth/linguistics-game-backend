@@ -36,6 +36,18 @@ export async function getAnswers(query, user) {
   return answers;
 }
 
+export async function getAnswersForResearch(query) {
+  const users = await Users.getUserIDs(query);
+  const answers = await Answer.find({ user: { $in: users } }).sort({ createdAt: -1 });
+  return answers;
+}
+
+export async function getAnswersForResearchManual(query) {
+  const users = await Users.getUserIDsManual(query);
+  const answers = await Answer.find({ user: { $in: users } }).sort({ createdAt: -1 });
+  return answers;
+}
+
 export async function getAnswer(id) {
   // await finding one answer
   const answer = await Answer.findById(id).lean();
@@ -46,9 +58,7 @@ export async function getAnswer(id) {
   return answer;
 }
 
-export async function voteAnswer(id, query, user) {
-  console.log('voting');
-  console.log(id);
+export async function voteAnswer(id, query, userID) {
   if (!query || !query.v) {
     throw new Error('missing valid query. usage: /answers/answerID/vote?v={-1,1}');
   }
@@ -58,15 +68,7 @@ export async function voteAnswer(id, query, user) {
   }
 
   const { v } = query;
-  console.log(`vote: ${v}`);
   const vote = parseInt(v, 10);
-
-  console.log(`vote: ${vote}`);
-
-  console.log(answer);
-
-  console.log(`answer user: ${answer.user}`);
-  console.log(`user: ${user._id}`);
 
   if (answer.user.equals(user._id)) {
     throw new Error('user cannot upvote own post');

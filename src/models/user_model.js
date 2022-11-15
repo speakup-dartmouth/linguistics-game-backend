@@ -14,6 +14,10 @@ const UserSchema = new Schema({
     type: String,
     enum: ['male', 'female', 'nonbinary', 'other'],
   },
+  role: {
+    type: String,
+    enum: ['USER', 'ADMIN'],
+  },
   birthday: Date,
   interests: [String],
   researchConsent: { type: Boolean, default: false },
@@ -62,6 +66,10 @@ UserSchema.method('toJSON', function toJSON() {
     __v, password, ...object
   } = this.toObject();
   return object;
+});
+
+UserSchema.virtual('age').get(() => {
+  return Math.floor((Date.now() - this.birthday.getTime()) / (1000 * 3600 * 24 * 365));
 });
 
 const UserModel = mongoose.model('User', UserSchema);
