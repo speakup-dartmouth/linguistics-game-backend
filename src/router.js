@@ -139,6 +139,7 @@ router.route('/users')
 router.route('/leaderboard')
   .get(async (req, res) => {
     try {
+      console.log('leaderboard era');
       const result = await Users.getTopUsers();
       res.json(result);
     } catch (error) {

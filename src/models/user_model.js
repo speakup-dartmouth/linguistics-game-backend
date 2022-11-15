@@ -68,10 +68,6 @@ UserSchema.method('toJSON', function toJSON() {
   return object;
 });
 
-UserSchema.virtual('age').get(() => {
-  return Math.floor((Date.now() - this.birthday.getTime()) / (1000 * 3600 * 24 * 365));
-});
-
 const UserModel = mongoose.model('User', UserSchema);
 
 export default UserModel;
