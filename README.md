@@ -8,7 +8,7 @@ Linguistics Games, a.k.a. Speak Up, is an innovative gameified mobile app that i
 
 ## Architecture
 ### Tech Stack 🥞
-The app is built using Express, Mongoose, and Node.
+The app is built using Express, MongoDB, and Node.
 
 [Frontend Repo](https://github.com/dali-lab/linguistics-games-frontend)
 ### File Structure
@@ -90,7 +90,7 @@ You may need to install or update `node` in order to install all the packages. T
 
 Deployed on Render, [https://linguistics-games.onrender.com/](https://linguistics-games.onrender.com/)
 
-See Notion Handoff Document for credentials.
+See Notion Handoff Document for credentials. The Render application is currently configured to auto-build a new version whenever commits are pushed to the `main` branch of this repository.
 
 ## Authors
 - Isabella Hochschild '25, Dev Mentor
