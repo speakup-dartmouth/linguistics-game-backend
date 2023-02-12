@@ -4,6 +4,7 @@
   "description": "",
   "author": "Linguistics Games",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "test": "eslint src",
     "start": "nodemon src/server.js --exec babel-node",
