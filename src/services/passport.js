@@ -18,7 +18,6 @@ const localOptions = { usernameField: 'email' };
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
   secretOrKey: 'process.env.AUTH_SECRET',
-  // secretOrKey: process.env.AUTH_SECRET,
 };
 // NOTE: we are not calling this a bearer token (although it technically is), if you see people use Bearer in front of token on the internet you could either ignore it, use it but then you have to parse it out here as well as prepend it on the frontend.
 
