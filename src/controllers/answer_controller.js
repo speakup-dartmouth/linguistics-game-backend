@@ -37,6 +37,15 @@ export async function getAnswers(query, user) {
   return answers;
 }
 
+export async function getAllAnswers() {
+  try {
+    const answers = await Answer.find();
+    return answers;
+  } catch (error) {
+    throw new Error(`get all answers error ${error}`);
+  }
+}
+
 export async function getAnswersForResearch(query) {
   const users = await Users.getUserIDs(query);
   const answers = await Answer.find({ user: { $in: users } }).sort({ createdAt: -1 });
