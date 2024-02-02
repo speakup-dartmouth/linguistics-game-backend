@@ -136,6 +136,16 @@ router.route('/users')
     }
   });
 
+  router.route('/users/:userID')
+    .get(async (req, res) => {
+      try {
+        const result = await Users.getUser(req.params.userID);
+        res.json(result);
+      } catch (error) {
+        res.status(404).json({ error: error.toString() });
+      }
+    });
+
 router.route('/leaderboard')
   .get(async (req, res) => {
     try {
