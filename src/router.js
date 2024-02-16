@@ -6,6 +6,7 @@ import { requireAuth, requireSignin } from './services/passport';
 import signS3 from './services/s3';
 import * as Answers from './controllers/answer_controller';
 import * as Info from './controllers/info_controller';
+import * as Suggestions from './controllers/suggestion_controller';
 
 dotenv.config({ silent: true });
 
@@ -68,6 +69,7 @@ router.route('/answers')
   .post(requireAuth, async (req, res) => {
     try {
       const result = await Answers.createAnswer(req.body, req.user);
+      console.log('running post')
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
@@ -79,6 +81,16 @@ router.route('/answers')
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.toString() });
+    }
+  });
+
+router.route('/allAnswers')
+  .get(requireAuth, async(req, res) => {
+    try {
+      const result = await Answers.getAllAnswers();
+      res.json(result);
+    } catch (error) {
+      res.status(404).json({ error: error.toString() })
     }
   });
 
@@ -115,6 +127,52 @@ router.route('/answers/:answerID/vote')
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: error.toString() });
+    }
+  });
+
+router.route('/suggestions')
+  .post(requireAuth, async (req, res) => {
+    try {
+      const result = await Suggestions.createSuggestion(req.body);
+      res.json(result);
+    } catch(error) {
+      res.status(422).json({ error: error.toString() });
+    }
+  })
+  .get(requireAuth, async (req, res) => {
+    try {
+      const result = await Suggestions.getSuggestions();
+      res.json(result);
+    } catch(error) {
+      res.status(422).json({ error: error.toString() });
+    }
+  });
+
+router.route('/suggestions/:suggestionID')
+  .get(requireAuth, async (req, res) => {
+    try {
+      const result = await Suggestions.getSuggestion(req.params.suggestionID);
+      res.json(result);
+    } catch (error) {
+      res.status(422).json({ error: error.toString() });
+    }
+  })
+  .delete(requireAuth, async (req, res) => {
+    try {
+      const result = await Suggestions.deleteSuggestion(req.params.suggestionID);
+      res.json(result);
+    } catch (error) {
+      res.status(422).json({ error: error.toString() });
+    }
+  });
+
+router.route('/suggestions/user/:userID')
+  .get(requireAuth, async(req, res) => {
+    try {
+      const result = await Suggestions.getUserSuggestions(req.params.userID);
+      res.json(result);
+    } catch (error) {
+      res.status(422).json({ error: error.toString() });
     }
   });
 

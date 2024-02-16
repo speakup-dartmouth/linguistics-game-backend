@@ -44,7 +44,7 @@ To run MongoDB locally on a Mac (after installing [Homebrew](https://brew.sh/)):
 ### Starting the local server 
 1. After cloning the repo, `cd` into the repo directory
 2. `npm install`
-3. `npm run dev`
+3. `npm run dev` (`npm run start`)
 
 This will start a local server connecting to the database at localhost:9090.
 
@@ -86,6 +86,17 @@ You may need to install or update `node` in order to install all the packages. T
 - demographicAttributes: Map of Strings - e.g. {'location':'New Hampshire', 'languagesSpoken':5}
 ```
 
+### Suggestion
+```
+- prompt*: String
+- stances*: [{color: String, stance: String}]
+- dateSubmitted*: Date
+- icon*: String
+- status: String
+- question: QuestionId
+- user*: UserId
+```
+
 ## Deployment 🚀
 
 Deployed on Render, [https://linguistics-games.onrender.com/](https://linguistics-games.onrender.com/)
@@ -95,6 +106,7 @@ See Notion Handoff Document for credentials. The Render application is currently
 ## Authors
 - Isabella Hochschild '25, Dev Mentor
 - Tyler Vergho '23, Dev
+- Edited by Gwen Wattenmaker '23, Dev
 
 ---
 Designed and developed by [@DALI Lab](https://github.com/dali-lab)
