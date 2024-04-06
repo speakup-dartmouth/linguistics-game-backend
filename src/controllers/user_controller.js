@@ -140,8 +140,12 @@ export const signup = async ({
     throw new Error('Password must be at least 8 characters');
   }
 
-  if (new Date(birthday) > new Date()) {
-    throw new Error('Birthday must be in the past');
+  const currentDate = new Date();
+  const userBirthday = new Date(birthday);
+  const minAgeDate = new Date(currentDate.getFullYear() - 18, currentDate.getMonth(), currentDate.getDate());
+
+  if (userBirthday > minAgeDate) {
+    throw new Error('You must be at least 18 years old to sign up');
   }
 
   if (!validateEmail(email)) {
