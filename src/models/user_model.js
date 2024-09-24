@@ -18,7 +18,7 @@ const UserSchema = new Schema({
     type: String,
     enum: ['USER', 'ADMIN'],
   },
-  birthday: Date,
+  over18: Boolean,
   interests: [String],
   researchConsent: { type: Boolean, default: false },
   score: Number,

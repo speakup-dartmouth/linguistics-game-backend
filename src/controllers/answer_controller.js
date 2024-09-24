@@ -48,6 +48,7 @@ export async function getAllAnswers() {
 
 export async function getAnswersForResearch(query) {
   const users = await Users.getUserIDs(query);
+  console.log(users);
   const answers = await Answer.find({ user: { $in: users } }).sort({ createdAt: -1 });
   return answers;
 }

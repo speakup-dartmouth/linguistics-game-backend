@@ -130,7 +130,7 @@ export const signin = (user) => {
 
 // note the lovely destructuring here indicating that we are passing in an object with these keys
 export const signup = async ({
-  username, email, password, gender, birthday, interests,
+  username, email, password, gender, over18, interests,
 }) => {
   if (!username || !email || !password) {
     throw new Error('You must provide username, email and password');
@@ -140,9 +140,9 @@ export const signup = async ({
     throw new Error('Password must be at least 8 characters');
   }
 
-  if (new Date(birthday) > new Date()) {
-    throw new Error('Birthday must be in the past');
-  }
+  // if (new Date(birthday) > new Date()) {
+  //   throw new Error('Birthday must be in the past');
+  // }
 
   if (!validateEmail(email)) {
     throw new Error('Email is not valid');
@@ -167,7 +167,7 @@ export const signup = async ({
   user.email = email;
   user.password = password;
   user.gender = gender;
-  user.birthday = new Date(birthday);
+  user.over18 = over18;
   user.interests = interests;
   user.researchConsent = false;
   user.role = 'USER';
